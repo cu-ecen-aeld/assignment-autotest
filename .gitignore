@@ -1,0 +1,5 @@
+Test_*_Runner.c
+test/unity_runner.c
+build
+*.o
+.automated-test
