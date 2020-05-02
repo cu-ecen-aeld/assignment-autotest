@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/cu-ecen-5013/assignment-autotest.svg?branch=master)](https://travis-ci.com/cu-ecen-5013/assignment-autotest)
+
 # assignment-autotest
 A repository which can be used for autotest of assignments, leveraging the [Unity](https://github.com/ThrowTheSwitch/Unity)
 automated test framework.
