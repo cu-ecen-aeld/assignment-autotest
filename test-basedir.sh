@@ -1,6 +1,7 @@
 #!/bin/bash
-# Test the example implementation, running against either a directory
-# specified as argument, or a temp directory created
+# This script can be copied into your base directory for use with
+# automated testing using assignment-autotest.  It automates the
+# steps described in https://github.com/cu-ecen-5013/assignment-autotest/blob/master/README.md#running-tests
 set -e
 pushd `dirname $0`
 # Create a build subdirectory, change into it, run
