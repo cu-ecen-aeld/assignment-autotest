@@ -12,7 +12,7 @@ This project is a [CMake](https://cmake.org/) and script wrapper around [Unity](
     pass on student's final submission.
  * Students can define their own test functions/files they use to test their code.
 
-See the [Unity](https://github.com/ThrowTheSwitch/Unity) refernece documentation for information about writing
+See the [Unity](https://github.com/ThrowTheSwitch/Unity) reference documentation for information about writing
 Unity test cases.
 
 ## Using This Repository
