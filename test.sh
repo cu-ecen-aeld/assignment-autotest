@@ -22,13 +22,13 @@ git submodule update --init --recursive
 # Copy the examples and parent-example cmake list files to
 # the parent work_dir directory.  Rename CMakeLists.txt so
 # we will use this as our CMakeLists.txt file
+# Copy the travis file to the base directory so it will support
+# Travis CI and rename it test.sh
 cp -r assignment-autotest/examples .
 cp assignment-autotest/CMakeLists-parent-example.txt ./CMakeLists.txt
-# Create a build subdirectory, change into it, run
-# cmake .. && make && run the assignment-autotest application
-mkdir -p build
-pushd build
-cmake ..
-make
-./assignment-autotest/assignment-autotest
+cp assignment-autotest/test-basedir.sh test.sh
+cp assignment-autotest/.travis.yml .
+# Run the test script (test-basedir.sh renamed) in the base directory,
+# Same as it will be run from Travis-CI
+./test.sh
 echo "Test success, working example in ${work_dir}"
