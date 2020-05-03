@@ -46,6 +46,13 @@ Refer to the comments in the [CMakeLists-parent-example.txt](CMakeLists-parent-e
 A simple example is shown in the [examples](examples) subdirectory, [CMakeLists-parent-example.txt](CMakeLists-parent-example.txt)
 file, and [test/assignment1](test/assignment1) subdirectory.
 
+### Update your gitignore
+Include these patterns in your root .gitignore file
+```
+Test_*_Runner.c
+build/
+```
+
 ### Running Tests
 Use cmake to build your parent project using something like:
 `mkdir build && cd build` then `cmake .. && make`
