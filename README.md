@@ -50,9 +50,17 @@ file, and [test/assignment1](test/assignment1) subdirectory.
 Use cmake to build your parent project using something like:
 `mkdir build && cd build` then `cmake .. && make`
 
-Then run `./assignment-autotest/assignment-autotest` from within the build directory to
+Then run `./assignment-autotest/assignment-autotest` from within the build directory to run the Unity based automated tests.
+
+These steps are automated in the `test-basedir.sh` script which you can copy into your base repository directory.
+
+### CI Integration
+If you [setup Travis-CI Integration](https://docs.travis-ci.com/user/tutorial/#to-get-started-with-travis-ci-using-github), you can add automated CI testing to your base repo by following these steps.
+
+1. Copy the `test-basedir.sh` script to the repository containing this submodule and rename `./test.sh`
+2. Copy the `.travis.yml` file to the base directory of the repository containing this submodule.
 
 ### Running An Example
 To see an example implementation in action, run the `./test.sh` script, passing in an argument to a directory subfolder on the host.  If
 the directory does not correspond to an existing git repository a git repository will be initialized there, then the steps to clone the
-repository as a submodule, add example tests, and run tests will be done automatically.
+repository as a submodule, add example tests, and run tests will be done automatically.  If no argument is specified, the example will be demonstrated in a temporary directory created on the host.
