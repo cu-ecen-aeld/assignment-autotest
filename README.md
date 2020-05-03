@@ -66,6 +66,7 @@ If you [setup Travis-CI Integration](https://docs.travis-ci.com/user/tutorial/#t
 
 1. Copy the `test-basedir.sh` script to the repository containing this submodule and rename `./test.sh`
 2. Copy the `.travis.yml` file to the base directory of the repository containing this submodule.
+3. If desired, [add a badge](https://docs.travis-ci.com/user/status-images/) to your README.md showing build status.  See the line at the top of this README.md for an example.
 
 ### Running An Example
 To see an example implementation in action, run the `./test.sh` script, passing in an argument to a directory subfolder on the host.  If
