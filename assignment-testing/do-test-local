@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 # 1st argument: absolute or relative path to the base directory
 # Defaults to dirname `git rev-parse --absolute-git-dir` if not specified
 
-pushd `dirname $0`
+cd `dirname $0`
 
-source script-helpers
+. script-helpers
 testdir=$1
 mkdir -p ../../build
 if [ $# -lt 1 ]; then
@@ -21,9 +21,9 @@ fi
 export githubstudent
 echo "Testing submission from student ${githubstudent}"
 
-pushd ${testdir}
+realpath ${testdir}
 ./test.sh
-popd
+cd ..
 
 . ./assignment-test.sh ${testdir}
 

@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 # 1st argument: absolute or relative path to the base directory
 # Defaults to dirname `git rev-parse --absolute-git-dir` if not specified
 
-pushd `dirname $0`
+cd `dirname $0`
 
 testdir=$1
 if [ $# -lt 1 ]; then

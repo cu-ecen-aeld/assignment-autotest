@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 # 1st argument: absolute or relative path to the directory containing code to be tested
-pushd `dirname $0`
+cd `dirname $0`
 
 testdir=$1
 set -e

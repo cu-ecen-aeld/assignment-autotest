@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-source script-helpers
+. script-helpers
 
 assignment-1-test-validation() {
 	filesdir=$1

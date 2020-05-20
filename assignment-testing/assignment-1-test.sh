@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-source assignment-1-test-iteration.sh
+. assignment-1-test-iteration.sh
 
-pushd $1
+cd $1
 
 filesdir=/tmp/aesd-data
 numfiles=10
