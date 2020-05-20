@@ -1,7 +1,7 @@
 # Travis-CI
 [![Build Status](https://travis-ci.com/cu-ecen-5013/assignment-autotest.svg?branch=master)](https://travis-ci.com/cu-ecen-5013/assignment-autotest)
 # Gitlab-CI
-[![Build Status](https://gitlab.com/cu-ecen-aesd/assignment-autotest/badges/master/pipeline.svg)](https://gitlab.com/cu-ecen-aesd/assignment-autotest/badges/master/pipeline.svg)
+[![Build Status](https://gitlab.com/cu-ecen-aesd/assignment-autotest/badges/master/pipeline.svg)](https://gitlab.com/cu-ecen-aesd/assignment-autotest)
 
 # assignment-autotest
 A repository which can be used for autotest of assignments, leveraging the [Unity](https://github.com/ThrowTheSwitch/Unity)
@@ -11,9 +11,10 @@ This project is a [CMake](https://cmake.org/) and script wrapper around [Unity](
  * Test dependencies to be included as a git submodule on student assignment repositories.
  * Instructors can define functions containing tests they expect to pass on completed student submissions, which
     can be shared with students through this repository in the test subfolder.
- * Instructors to define functions containing tests that will not be shared with students but which should also
-    pass on student's final submission.
- * Students can define their own test functions/files they use to test their code.
+ * Instructors can define files containing tests that will *not* be shared with students but which should also
+    pass on student's final submission.  These will be located in the parent repository containing this repository as a submodule.
+ * Students can define their own test functions/files they use to test their code in their own repositories, referencing this repository
+    as a submodule.
 
 See the [Unity](https://github.com/ThrowTheSwitch/Unity) reference documentation for information about writing
 Unity test cases.
@@ -24,10 +25,11 @@ Follow the instructions in this section to setup your source code repository wit
 
 ### Setting Up Your Host
 
-1. Install ruby on your host. This is used to [run unity helper scripts](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityHelperScriptsGuide.md) used to generate test runner files.  
-2. Install cmake on your host.
+1. Install `build-essential` or equivalent on non-ubuntu platforms (gcc, g++, make).
+2. Install ruby on your host. This is used to [run unity helper scripts](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityHelperScriptsGuide.md) used to generate test runner files.
+3. Install cmake on your host.
 
-On Ubuntu the above two steps can be completed with `sudo apt-get install -y ruby cmake`.
+On Ubuntu the above steps can be completed with `sudo apt-get install -y build-essential ruby cmake`.
 
 
 ### Clone this repository as a submodule
