@@ -17,7 +17,7 @@ pushd ${work_dir}
 if [ ! -f ${work_dir}/.git ]; then
     git init
 fi
-git submodule add -f ${autotest_sourcedir}
+git submodule add -f ${autotest_sourcedir} assignment-autotest
 git submodule update --init --recursive
 # Copy the examples and parent-example cmake list files to
 # the parent work_dir directory.  Rename CMakeLists.txt so

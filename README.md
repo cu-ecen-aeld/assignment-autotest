@@ -1,4 +1,7 @@
+# Travis-CI
 [![Build Status](https://travis-ci.com/cu-ecen-5013/assignment-autotest.svg?branch=master)](https://travis-ci.com/cu-ecen-5013/assignment-autotest)
+# Gitlab-CI
+[![Build Status](https://gitlab.com/cu-ecen-aesd/assignment-autotest/badges/master/pipeline.svg)](https://gitlab.com/cu-ecen-aesd/assignment-autotest/badges/master/pipeline.svg)
 
 # assignment-autotest
 A repository which can be used for autotest of assignments, leveraging the [Unity](https://github.com/ThrowTheSwitch/Unity)
@@ -62,13 +65,27 @@ Then run `./assignment-autotest/assignment-autotest` from within the build direc
 These steps are automated in the `test-basedir.sh` script which you can copy into your base repository directory.
 
 ### CI Integration
+
+#### Travis-CI
 If you [setup Travis-CI Integration](https://docs.travis-ci.com/user/tutorial/#to-get-started-with-travis-ci-using-github), you can add automated CI testing to your base repo by following these steps.
 
 1. Copy the `test-basedir.sh` script to the repository containing this submodule and rename `./test.sh`
 2. Copy the `.travis.yml` file to the base directory of the repository containing this submodule.
 3. If desired, [add a badge](https://docs.travis-ci.com/user/status-images/) to your README.md showing build status.  See the line at the top of this README.md for an example.
 
+#### Gitlab-CI
+If you [setup Gitlab-CI Integration](https://docs.gitlab.com/ee/ci/ci_cd_for_external_repos/github_integration.html), you can add automated CI testing to your base
+repo by following these steps.
+
+1. Copy the `test-basedir.sh` script to the repository containing this submodule and rename `./test.sh`
+2. Copy the `.gitlab-ci.yml` file to the base directory of the repository containing this submodule.
+3. If desired, [add a badge](https://docs.gitlab.com/ee/user/project/badges.html) to your README.md showing build status.  See the line at the top of this README.md for an example.
+
+
 ### Running An Example
 To see an example implementation in action, run the `./test.sh` script, passing in an argument to a directory subfolder on the host.  If
 the directory does not correspond to an existing git repository a git repository will be initialized there, then the steps to clone the
 repository as a submodule, add example tests, and run tests will be done automatically.  If no argument is specified, the example will be demonstrated in a temporary directory created on the host.
+
+#### Running Example Using Docker
+You can run test in a docker container using the [docker/docker-run-test.sh](docker/docker-run-test.sh) script.

@@ -1,0 +1,5 @@
+image: "cuaesd/aesd-autotest"
+
+test:
+    script:
+        - ./test.sh
