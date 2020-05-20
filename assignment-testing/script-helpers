@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Set this with a string describing the validation error(s) if any occur
 export validate_error=
@@ -6,17 +6,17 @@ export validate_error=
 # See https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 RED='\033[0;31m'
 NC='\033[0m' # No Color
-function add_validate_error {
+add_validate_error() {
 	validate_error="${validate_error}:$1"
 	export validate_error
 	printf "${RED}Validation Error:$1${NC}\n"
 }
-function wait-for-qemu {
+wait_for_qemu() {
 	echo "TODO: poll for up to 1 minute waiting for successful ssh login, exit 1 if failed"
 	sleep 60
 }
 
-function validate-qemu {
+validate_qemu() {
 	wait-for-qemu
 	echo "TODO: perform additional qemu validation"
 	./sockettest.sh

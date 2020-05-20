@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 # 1st argument: absolute or relative path to the base directory
 # Defaults to dirname `git rev-parse --absolute-git-dir` if not specified
 
-cd `dirname $0`
+pushd `dirname $0`
 
-. script-helpers
-. assignment-timeout
+source script-helpers
+source assignment-timeout
 
 testdir=$1
 githubstudent=$2

@@ -1,8 +1,8 @@
 #!/bin/sh
 
-. script-helpers
+. ./script-helpers
 
-assignment-1-test-validation() {
+assignment_1_test_validation() {
 	filesdir=$1
 	numfiles=$2
 	writestr=$3

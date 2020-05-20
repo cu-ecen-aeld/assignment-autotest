@@ -4,7 +4,7 @@
 
 cd `dirname $0`
 
-. script-helpers
+. ./script-helpers
 testdir=$1
 mkdir -p ../../build
 if [ $# -lt 1 ]; then
