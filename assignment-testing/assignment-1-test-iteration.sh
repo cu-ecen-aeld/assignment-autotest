@@ -6,11 +6,12 @@ assignment_1_test_validation() {
 	filesdir=$1
 	numfiles=$2
 	writestr=$3
+	username=$4
 	curr_day=$(date '+%d')
 	curr_month=$(date '+%m')
 	curr_year=$(date '+%Y')
 	
-	files_list=$(find ${filesdir} -name "${writestr}*")
+	files_list=$(find ${filesdir} -name "${username}*.txt")
 	files_created=$(echo "${files_list}" | wc -l)
 
 	if [ ${files_created} -ne ${numfiles} ]; then
@@ -19,7 +20,7 @@ assignment_1_test_validation() {
 	
 	for i in $( seq 1 $numfiles)
 	do
-		act_date=$(tail "${filesdir}/${writestr}${i}" -n 1)
+		act_date=$(tail "${filesdir}/${username}${i}.txt" -n 1)
 		act_day=$(date --date="$act_date" "+%d")
 		act_month=$(date --date="$act_date" "+%m")
 		act_year=$(date --date="$act_year" "+%Y")
