@@ -9,26 +9,6 @@ An overview of scripts and usage is found below
 The assignment testing steps require Docker Community Edition.  See install instructions [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/) for ubuntu
 
 
-## github-classroom-scripts and scripts_config
-
-These are the github classroom scripts useful for pulling files from github classroom and creating pull requests for
-submissions.  See [https://github.com/dwalkes/github-classroom-scripts](https://github.com/dwalkes/github-classroom-scripts)
-for more detail.
-
-## testall.sh
-Kick off tests of all student repository submissions using github classroom scripts.  This is the command which should
-be run after the due date to test all assignment repositories.  This script supports additional arguments passed to `prsetup.py`,
-for instance to specify running against a single student repository.
-
-Each student's submission will be checked out to a directory under `~/pr-script-clone` and a log file containing results of the
-submission can be found in the `~/test_script_results/` directory.
-
-To grep for students whose assignment failed testing, you can use a command like:
-
-`grep "Exiting with failure" ~/test_script_results/*assignmentX_*.log` substituting the 'X' with the assignment number.  Use
-a similar search to look for the number of students who failed with specific failure types
-
-
 ## assignment-testing
 
 This directory contains scripts used to test assignments.  An overview of each script and its usage is listed below
