@@ -28,5 +28,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
 # Generate our test runner using the auto_generate.sh script
 add_custom_command(OUTPUT ${RUNNER_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/test/unity_runner.c
                    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/auto_generate.sh ${AUTOTEST_SOURCES}
+                   DEPENDS ${AUTOTEST_SOURCES}
                 )
 set(CMAKE_BUILD_TYPE Debug)

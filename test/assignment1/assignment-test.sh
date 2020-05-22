@@ -1,14 +1,16 @@
 #!/bin/sh
+# First parameter, if specified
 
+cd `dirname $0`
+. ./script-helpers
 . ./assignment-1-test-iteration.sh
 
-cd $1
+cd ../../../
 
 filesdir=/tmp/aesd-data
 numfiles=10
 writestr="AESD_IS_AWESOME"
-#TODO: Add student username for every instance
-username=your-github-name-here
+username=$(cat conf/username.txt)
 
 ./writer.sh
 rc=$?
@@ -39,3 +41,10 @@ writestr="Random_char_string${randomstring}"
 
 ./tester.sh ${numfiles} ${writestr}
 assignment_1_test_validation ${filesdir} ${numfiles} ${writestr} ${username}
+
+if [ -z "${validate_error}" ]; then
+    exit 0
+else
+    echo "Test failed with error : ${validate_error}"
+    exit 1
+fi
