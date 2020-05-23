@@ -1,0 +1,39 @@
+#!/bin/bash
+# Options parsing functions shared between docker script environments
+
+# Parse the list of docker options passed
+# (Use "$@" as passed parameter)
+function parse_docker_options {
+    uid=
+    gid=
+    while getopts ":i:g:" opt; do
+        case ${opt} in
+            i )
+                uid=$OPTARG
+                ;;
+            g )
+                gid=$OPTARG
+                ;;
+ 
+            \? )
+                echo "Invalid option: $OPTARG" 1>&2
+                ;;
+            : )
+                echo "Invalid option: $OPTARG requires an argument" 1>&2
+                ;;
+        esac
+    done
+    shift $((OPTIND -1))
+    if [ ! -z ${uid} ]; then
+        # If a uid argument was specified, add a user to the container with this uid/gid and
+        # then restart the script with this uid/gid
+        echo "Adding user aesd with uid ${uid} gid ${gid}"
+        groupadd -g ${gid} aesd
+        adduser --uid ${uid} --gid ${gid} --disabled-password --gecos '' aesd 
+        adduser aesd sudo
+        echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+        # This runs the rest of the script as the "aesd" user
+        # see trick at https://stackoverflow.com/a/29969243/1446624
+        exec su aesd $0
+    fi
+}
