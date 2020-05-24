@@ -15,13 +15,14 @@ This project is a [CMake](https://cmake.org/) and script wrapper around [Unity](
     pass on student's final submission.  These will be located in the parent repository containing this repository as a submodule.
  * Students can define their own test functions/files they use to test their code in their own repositories, referencing this repository
     as a submodule.
+ * Other tests which aren't unity based can also be located in the appropriate test/assignment subdirectory and included with automated tests
 
 See the [Unity](https://github.com/ThrowTheSwitch/Unity) reference documentation for information about writing
 Unity test cases.
 
 ## Using This Repository
 
-Follow the instructions in this section to setup your source code repository with assignment t
+Follow the instructions in this section to setup your source code repository with assignments.
 
 ### Setting Up Your Host
 
@@ -60,11 +61,15 @@ build/
 
 ### Running Tests
 Use cmake to build your parent project using something like:
-`mkdir build && cd build` then `cmake .. && make`
+`mkdir build && cd build` then `cmake .. && make && cd ..`
 
-Then run `./assignment-autotest/assignment-autotest` from within the build directory to run the Unity based automated tests.
+Then run `build/assignment-autotest/assignment-autotest` from within the build directory to run the Unity based automated tests.
 
-These steps are automated in the `test-basedir.sh` script which you can copy into your base repository directory.
+You can add additional tests to cover other assignment requirements in the [test](test) directory, and use logic in your
+test script to pull them in.
+
+These steps are automated in the `test-basedir.sh` script which you can copy into your base repository directory and use
+as a template example
 
 ### CI Integration
 
@@ -90,4 +95,15 @@ the directory does not correspond to an existing git repository a git repository
 repository as a submodule, add example tests, and run tests will be done automatically.  If no argument is specified, the example will be demonstrated in a temporary directory created on the host.
 
 #### Running Example Using Docker
-You can run test in a docker container using the [docker/docker-run-test.sh](docker/docker-run-test.sh) script.
+
+Running tests in Docker is a useful step to simulate the behavior on the CI build system.  This is especially true for gitlab-ci builds since these
+are configured to use the same image.
+
+Start by setting up docker community edition on your host.  See install instructions [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/) for Ubuntu.
+
+You can run test in a docker container using the [docker/docker-run-test.sh](docker/docker-run-test.sh) script. This script is currently
+setup to use the same image used for gitlab-ci testing, [cuaesd/aesd-autotest](https://hub.docker.com/repository/docker/cuaesd/aesd-autotest) but could be customized to use
+any docker container suitable for your assignments. 
+
+Run from any base directory containing a `test.sh` script.  The script will start the docker container, pass through the base directory as a volume, change user/group ID
+of the user in the container to match the caller (to avoid permission issues with builds outside the container), and then run the test script.

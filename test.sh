@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Test the example implementation, running against either a directory
 # specified as argument, or a temp directory created
 set -e
@@ -8,12 +8,12 @@ if [ $# -eq 1 ]; then
 else
     work_dir=`mktemp -d`
 fi
-pushd `dirname $0`
+cd `dirname $0`
 mkdir -p ${work_dir}
 autotest_sourcedir=`pwd`
 # Copy the contents of the repository into work_dir to
 # simulate a proejct which adds this project as a submodule
-pushd ${work_dir}
+cd ${work_dir}
 if [ ! -f ${work_dir}/.git ]; then
     git init
 fi
@@ -28,6 +28,7 @@ cp -r assignment-autotest/examples .
 cp assignment-autotest/CMakeLists-parent-example.txt ./CMakeLists.txt
 cp assignment-autotest/test-basedir.sh test.sh
 cp assignment-autotest/.travis.yml .
+cp assignment-autotest/.gitlab-ci.yml .
 # Run the test script (test-basedir.sh renamed) in the base directory,
 # Same as it will be run from Travis-CI
 ./test.sh
