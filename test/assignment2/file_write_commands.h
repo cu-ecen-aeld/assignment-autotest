@@ -23,7 +23,6 @@ static inline char * return_string_validation()
 {
     size_t len = 0;
     char *buffer = malloc(1);
-    printf("seg fault test");
     FILE *fp = fopen("testfile.txt","r");
     ssize_t bytes_read = -1;
     buffer[0] = 0;

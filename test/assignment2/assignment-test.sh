@@ -16,32 +16,32 @@ chmod 777 arm-unknown-linux-gnueabi-gcc
 
 #Writing contents to arm-unknown-linux-gnueabi-gcc
 #A file named validation.txt will be created if arm-unknown-linux-gnueabi-gcc is invoked
-echo "#!/bin/bash">> arm-unknown-linux-gnueabi-gcc
+echo "#!/bin/sh">> arm-unknown-linux-gnueabi-gcc
 echo "touch validation.txt" >> arm-unknown-linux-gnueabi-gcc
 
 #set the compiler path to arm-unknown-linux-gnueabi-gcc created
 export PATH=$PATH:$(pwd)
 
-make clean -C ../test-source
-make CROSS_COMPILE=arm-unknown-linux-gnueabi- -C ../test-source
+make clean
+make CROSS_COMPILE=arm-unknown-linux-gnueabi-
 
 #check if cross compiling was successful
-file="../test-source/validation.txt"
+file="validation.txt"
 if [ ! -f "$file" ]
 then
 	add_validate_error "Error in cross compiling of make file"
 else
 	#remove the temporary file if created
-	rm ../test-source/validation.txt
+	rm validation.txt
 fi
 
 #removing the temporaryly created files
 echo "removing file arm-unknown-linux-gnueabi-gcc"
 rm arm-unknown-linux-gnueabi-gcc
 
-make clean -C ../test-source
+make clean
 
-make -C ../test-source
+make
 
 # ------------------------------------------------- #
 filesdir=/tmp/aesd-data
