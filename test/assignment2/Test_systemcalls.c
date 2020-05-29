@@ -36,7 +36,7 @@ void test_systemcalls()
 
     do_system(4, "echo","home is $HOME",">","testfile.txt");
     test_string = return_string_validation();
-    int test_value = strncmp(test_string, "home is /home/", 14);
+    int test_value = strncmp(test_string, "home is /", 9);
     // Testing implementation with testfile.txt output 
     TEST_ASSERT_EQUAL_INT16_MESSAGE(test_value, 0, "test home is $HOME echo");
     free((void *)test_string);
@@ -48,7 +48,7 @@ void test_systemcalls()
 
     do_exec_redirect("testfile.txt", 3, "/bin/sh", "-c", "echo home is $HOME");
     const char *test_string_2 = return_string_validation();
-    test_value = strncmp(test_string_2, "home is /home/", 14);
+    test_value = strncmp(test_string_2, "home is /", 9);
     // Testing implementation with testfile.txt output 
     TEST_ASSERT_EQUAL_INT16_MESSAGE(test_value, 0, "test home is $HOME full path");
     free((void *)test_string_2);
