@@ -37,6 +37,7 @@ void test_systemcalls()
     do_system(4, "echo","home is $HOME",">","testfile.txt");
     test_string = return_string_validation();
     int test_value = strncmp(test_string, "home is /", 9);
+    printf("test_value: %d", test_value);
     // Testing implementation with testfile.txt output 
     TEST_ASSERT_EQUAL_INT16_MESSAGE(test_value, 0, "test home is $HOME echo");
     free((void *)test_string);
