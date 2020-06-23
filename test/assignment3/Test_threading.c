@@ -1,7 +1,7 @@
 #include "unity.h"
 #include <stdbool.h>
 #include <stdlib.h>
-#include "../../../../examples/threading/threading.h"
+#include "../../../examples/threading/threading.h"
 
 /**
 * This function should:
