@@ -1,0 +1,228 @@
+#!/bin/sh
+
+. ./script-helpers
+
+
+#Checking makefile implementation with CROSS_COMPILE Variable
+#Some students have used make all CROSS_COMPILE=.. in their script.
+#This function should be executed from the students repository path in order to find writer.c and makefile
+makefile_check() {
+make clean                                                                                                                                                                                                                                                                                                                                                                                                                                               
+make CROSS_COMPILE=arm-unknown-linux-gnueabi-
+rc=$?
+if [ $rc -ne 0 ]; then
+	make clean
+	make all CROSS_COMPILE=arm-unknown-linux-gnueabi-
+	if [ $rc -ne 0 ]; then
+		add_validate_error "Makefile does not work with CROSS_COMPILE=arm-unknown-linux-gnueabi"			
+	else
+		file writer | grep "ELF 32-bit LSB executable"		
+		rc=$?
+		if [ $rc -ne 0 ]; then
+			add_validate_error "writer utility generated is not cross compiled"
+		else 
+			echo "Cross Compile Successful using Makefile"
+		fi
+	fi
+else
+	file writer | grep "ELF 32-bit LSB executable"
+	rc=$?
+	if [ $rc -ne 0 ]; then
+		add_validate_error "writer utility generated is not cross compiled"
+	else 
+		echo "Cross Compile Successful using Makefile"
+	fi
+fi
+make clean
+}
+
+
+#Function to replace #!/bin/bash by #!/bin/sh in file provided as an argument if found
+#Argument 1: The path where the file is located. Mostly Student repository. The path can be relative or absolute from the current calling directory.
+#Better to execute this function from the students repository path
+bash_to_sh() {
+filename=$1
+cat "${filename}" | grep "#!/bin/sh" 
+rc=$?
+if [ $rc -ne 0 ]; then
+	add_validate_error "${filename} contains #!/bin/bash"
+	echo "#!/bin/bash replaced by #!/bin/sh in ${filename}"	
+	sed -i 's/bash/sh/' "${filename}"
+	status_check "#!/bin/bash to #!/bin/sh in ${filename}"
+else
+	echo "${filename} already consists of #!/bin/sh"
+fi
+}
+
+
+#Check for versatile-pb.dtb, zImage and initramfs.cpio.gz
+#Argument 1: Path to output files. i.e OUTDIR
+qemu_boot_files_check() {
+OUTDIR=$1
+
+if [ ! -e "${OUTDIR}/versatile-pb.dtb" ]; then
+	add_validate_error "Cannot find versatile-pb.dtb in $OUTDIR"
+	echo "Copying versatile-pb.dtb to ${OUTDIR}"	
+	find "${OUTDIR}" -name versatile-pb.dtb -exec cp {} ${OUTDIR} \;
+	status_check "versatile-pb.dtb to ${OUTDIR}"
+else
+	echo "versatile-pb.dtb already exists in ${OUTDIR}"
+fi
+
+if [ ! -e "${OUTDIR}/zImage" ]; then
+	add_validate_error "Cannot find zImage in $OUTDIR"
+	echo "Copying zImage to ${OUTDIR}"	
+	find "${OUTDIR}" -name zImage -exec cp {} ${OUTDIR} \;
+	status_check "zImage copy to ${OUTDIR}"	
+else
+	echo "zImage already exists to ${OUTDIR}"		
+fi
+
+if [ ! -e "${OUTDIR}/initramfs.cpio.gz" ]; then
+	add_validate_error "Cannot find initramfs.cpio.gz in $OUTDIR"
+	echo "Creating initramfs.cpio.gz in ${OUTDIR} since not present"	
+	find "${OUTDIR}/rootfs" | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
+	realpath "${OUTDIR}"
+	#-f is written below in order to force it to overwrite if initramfs.cpio already exists.
+	gzip -f initramfs.cpio
+	cd ..
+	status_check "initramfs.cpio.gz creation in $OUTDIR"
+else
+	echo "initramfs.cpio.gz already exists"
+fi
+}
+
+
+#Function to find the cpio file line and force it to overwrite if it doesn't
+##WARNING: Students might employ other methods in order to overwrite the .cpio.gz file. Check manually in code if faced with validation error.
+#This function should be executed from the students repository path in order to find "gzip -f initramfs.cpio" in manual_linux.sh
+overwrite_cpio_check() {
+grep -rl "gzip -f initramfs.cpio"
+rc=$?
+if [ $rc -ne 0 ]; then
+	add_validate_error "Manual_linux.cpio may not be able to overwrite .cpio.gz file"
+	echo "Adding -f flag to overwrite .cpio file"
+	find . -type f -exec sed -i 's/gzip[[:space:]]initramfs.cpio/gzip -f initramfs.cpio/g' {} \; 
+	status_check "-f flag to overwrite .cpio file"
+else
+	echo "Overwrite condition for initramfs.cpio is taken care by the script"
+fi
+}
+
+
+#Function to check for device nodes: /dev/null and /dev/console in ${OUTDIR}/rootfs
+#Argument 1: Path to output files. i.e OUTDIR
+device_node_check() {
+OUTDIR=$1
+
+if [ ! -c "${OUTDIR}/rootfs/dev/null" ]; then
+	add_validate_error "manual_linux.sh does not create a /dev/null device node"
+	#Adding a /dev/null device node
+	sudo mknod -m 666 "${OUTDIR}/rootfs/dev/null" c 1 3
+	status_check "/dev/null device node Creation"	
+else
+	echo "/dev/null device node already exists"
+fi
+
+
+if [ ! -c "${OUTDIR}/rootfs/dev/console" ]; then
+	add_validate_error "manual_linux.sh does not create a /dev/console device node"
+	#Adding a /dev/null device node
+	sudo mknod -m 666 "${OUTDIR}/rootfs/dev/console" c 5 1
+	status_check "/dev/console device node Creation"	
+else
+	echo "/dev/console device node already exists"
+fi
+}
+
+
+#Function to check for all the required library files.
+#Argument 1: Path to output files. i.e OUTDIR
+library_check() {
+OUTDIR=$1
+LIB_PATH=${OUTDIR}/rootfs/lib
+if [ ! -e "${LIB_PATH}/ld-2.29.so" ] || [ ! -L "${LIB_PATH}/ld-linux.so.3" ] || [ ! -e "${LIB_PATH}/libc-2.29.so" ] || [ ! -L "${LIB_PATH}/libc.so.6" ] || [ ! -e "${LIB_PATH}/libm-2.29.so" ] || [ ! -L "${LIB_PATH}/libm.so.6" ] || [ ! -e "${LIB_PATH}/libresolv-2.29.so" ] || [ ! -L "${LIB_PATH}/libresolv.so.2" ]; then
+	add_validate_error "One or more required libraries are missing in ${OUTDIR}/rootfs/home"
+	export SYSROOT=$(arm-unknown-linux-gnueabi-gcc -print-sysroot)
+
+	#Copying necessary library files in the rootfs/lib folder.
+	echo "Copying necessary library files to ${LIB_PATH}"
+	sudo cp -a $SYSROOT/lib/ld-linux.so.3 "${LIB_PATH}"
+	sudo cp -a $SYSROOT/lib/ld-2.29.so "${LIB_PATH}"
+	sudo cp -a $SYSROOT/lib/libm.so.6 "${LIB_PATH}"
+	sudo cp -a $SYSROOT/lib/libm-2.29.so "${LIB_PATH}"
+	sudo cp -a $SYSROOT/lib/libresolv.so.2 "${LIB_PATH}"
+	sudo cp -a $SYSROOT/lib/libresolv-2.29.so "${LIB_PATH}"
+	sudo cp -a $SYSROOT/lib/libc.so.6 "${LIB_PATH}"
+	sudo cp -a $SYSROOT/lib/libc-2.29.so "${LIB_PATH}"
+else
+	echo "All the libraries already exist in ${LIB_PATH}"
+fi
+}
+
+
+#Function to check if executables writer, finder.sh and tester.sh are in correct location i.e ${OUTDIR}/rootfs/home
+#Argument 1: Path to output files. i.e OUTDIR
+#This function should be executed from the students repository path in order to find writer.c, finder.sh and tester.sh
+executables_check() {
+OUTDIR=$1
+
+if [ ! -e "${OUTDIR}/rootfs/home/writer" ]; then
+	add_validate_error "writer executable not found in ${OUTDIR}/rootfs/home"
+	#Using direct recipe since not sure if students makefile would work or not
+	rm -rf writer				#cleaning old writer utility
+	arm-unknown-linux-gnueabi-gcc -g -Wall -I/ writer.c -o writer
+	echo "Copying cross-compiled writer executable to ${OUTDIR}/rootfs/home"
+	sudo cp writer "${OUTDIR}/rootfs/home"
+	status_check "writer executable copy to ${OUTDIR}/rootfs/home"
+else
+	echo "writer executable already exists in ${OUTDIR}/rootfs/home"
+fi
+
+
+if [ ! -e "${OUTDIR}/rootfs/home/finder.sh" ]; then
+	add_validate_error "finder.sh not found in ${OUTDIR}/rootfs/home"
+	echo "Copying finder.sh to ${OUTDIR}/rootfs/home"
+	sudo cp finder.sh "${OUTDIR}/rootfs/home"
+	status_check "finder.sh copy to ${OUTDIR}/rootfs/home"
+else
+	echo "finder.sh already exists in ${OUTDIR}/rootfs/home"
+fi
+
+
+if [ ! -e "${OUTDIR}/rootfs/home/tester.sh" ]; then
+	add_validate_error "tester.sh not found in ${OUTDIR}/rootfs/home"
+	echo "Copying tester.sh to ${OUTDIR}/rootfs/home"
+	sudo cp tester.sh "${OUTDIR}/rootfs/home"
+	status_check "tester.sh copy to ${OUTDIR}/rootfs/home"
+else
+	echo "tester.sh already exists in ${OUTDIR}/rootfs/home"
+fi
+}
+
+
+#Function to check if INSTALL_MOD_PATH has been used or not
+#Argument 1: Path to output files. i.e OUTDIR
+modules_check() {
+OUTDIR=$1
+if [ ! -d "${OUTDIR}/rootfs/lib/modules" ]; then
+	add_validate_error "manual_linux.sh does not use INSTALL_MOD_PATH=path/to/rootfs modules_install"
+fi
+}
+
+
+#Function to check the ownership of rootfs
+#Argument 1: Path to output files. i.e OUTDIR
+rootfs_ownership_check() {
+OUTDIR=$1
+for file in "${OUTDIR}/rootfs/*"
+do
+	owner=$(stat -c '%U' ${file})	
+	if [ "${owner}" != "root" ]; then
+		add_validate_error "${OUTDIR} has one or more directory with non-root ownership"
+		echo "${owner}"
+		break;
+	fi
+done
+}
+

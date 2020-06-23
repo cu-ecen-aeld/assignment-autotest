@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# Set this with a string describing the validation error(s) if any occur
+export validate_error=
+
+# See https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+add_validate_error() {
+	validate_error="${validate_error}:$1"
+	export validate_error
+	printf "${RED}Validation Error:$1${NC}\n"
+}
+
+wait_for_qemu() {
+	echo "TODO: poll for up to 1 minute waiting for successful ssh login, exit 1 if failed"
+	sleep 60
+}
+
+validate_qemu() {
+	wait-for-qemu
+	echo "TODO: perform additional qemu validation"
+	./sockettest.sh
+	if [ $? -ne 0 ]; then
+		add_validate_error "sockettest.sh failed when running on qemu instance"
+	fi
+}
+
+read_qemu() {
+while read line; do
+	echo "${line}"
+		if [[ $line == *"$1"* ]]; then
+		break;
+		fi
+	done < /tmp/guest.out
+}
+
+write_qemu() {
+printf "$1\n" > /tmp/guest.in
+}
+
+read_qemu_dump() {
+while read line; do
+	echo "${line}" > /dev/null 2>&1
+		if [[ $line == *"$1"* ]]; then
+		break;
+		fi
+	done < /tmp/guest.out
+}
+
+
+status_check() {
+rc=$?
+if [ $rc -ne 0 ]; then
+	echo "Status Check Failure: ${1}"
+else
+	echo "Status Check Success: ${1}"
+fi
+}
