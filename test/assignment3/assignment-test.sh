@@ -5,7 +5,7 @@ cd `dirname $0`
 . ./assignment-timeout
 . ./assignment-3-checks
                                                         
-cd ../../../../
+cd ../../../
 
 cdir=`pwd`
 OUTDIR=${cdir}/aesd-build 
@@ -103,8 +103,8 @@ if [ $manual_linux_success_flag -ne 0 ]; then
 
 
 	echo "Starting QEMU"
-	./assignment-autotest/test/assignment3/assignment-testing/test_start_qemu_terminal.sh "${OUTDIR}" &
-	timeout ${qemu_timeout} ./assignment-autotest/test/assignment3/assignment-testing/test_qemu_data.sh
+	./assignment-autotest/test/assignment3/test_start_qemu_terminal.sh "${OUTDIR}" &
+	timeout ${qemu_timeout} ./assignment-autotest/test/assignment3/test_qemu_data.sh
 	#rc value would be 124 if read_qemu is interrupted by timeout. 0 for success
 	#read_qemu getting interrupted would mean that the either manual_linux.sh does not consist of key components for qemu to boot up or test_start_qemu_terminal.sh failed.
 	rc=$?	
