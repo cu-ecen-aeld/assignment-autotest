@@ -65,8 +65,10 @@ Use cmake to build your parent project using something like:
 
 Then run `build/assignment-autotest/assignment-autotest` from within the build directory to run the Unity based automated tests.
 
+You can run only the unity based automated tests using the `test-unit.sh` script.
+
 You can add additional tests to cover other assignment requirements in the [test](test) directory, and use logic in your
-test script to pull them in.
+./test.sh test script to pull them in.
 
 These steps are automated in the `test-basedir.sh` script which you can copy into your base repository directory and use
 as a template example
