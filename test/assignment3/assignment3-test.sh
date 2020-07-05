@@ -4,8 +4,12 @@ cd `dirname $0`
 . ./script-helpers
 . ./assignment-timeout
 . ./assignment-3-checks
-                                                        
+
+scriptsdir=`pwd`
 cd ../../../
+
+# For run within the docker container, to ensure we have acces to crosstool-ng tools
+export PATH="/home/autotest-admin/x-tools/arm-unknown-linux-gnueabi/bin:${PATH}"
 
 cdir=`pwd`
 OUTDIR=${cdir}/aesd-build 
@@ -95,7 +99,7 @@ if [ $manual_linux_success_flag -ne 0 ]; then
 
 	#adding necessary helper scripts
 	echo "Adding necessary helper scripts to the image"
-	./assignment-autotest/test/assignment3/assignment-testing/assignment-3-test-add-scripts.sh "${OUTDIR}" #>/dev/null 2>&1
+	${scriptsdir}/assignment-3-test-add-scripts.sh "${OUTDIR}" #>/dev/null 2>&1
 	rc=$?
 	if [ $rc -ne 0 ]; then
 		add_validate_error "assignment-3-test-add-scripts.sh should have exited with return value 0"
@@ -103,8 +107,8 @@ if [ $manual_linux_success_flag -ne 0 ]; then
 
 
 	echo "Starting QEMU"
-	./assignment-autotest/test/assignment3/test_start_qemu_terminal.sh "${OUTDIR}" &
-	timeout ${qemu_timeout} ./assignment-autotest/test/assignment3/test_qemu_data.sh
+	${scriptsdir}/test_start_qemu_terminal.sh "${OUTDIR}" &
+	timeout ${qemu_timeout} ${scriptsdir}/test_qemu_data.sh
 	#rc value would be 124 if read_qemu is interrupted by timeout. 0 for success
 	#read_qemu getting interrupted would mean that the either manual_linux.sh does not consist of key components for qemu to boot up or test_start_qemu_terminal.sh failed.
 	rc=$?	
@@ -135,4 +139,3 @@ echo "Deleting pipe, aesd-build and default directory"
 rm /tmp/guest.in /tmp/guest.out
 sudo rm -rf "${cdir}/aesd-build"		
 sudo rm -rf /tmp/ecen5013
-
