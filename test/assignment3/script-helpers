@@ -27,29 +27,6 @@ validate_qemu() {
 	fi
 }
 
-read_qemu() {
-while read line; do
-	echo "${line}"
-		if [[ $line == *"$1"* ]]; then
-		break;
-		fi
-	done < /tmp/guest.out
-}
-
-write_qemu() {
-printf "$1\n" > /tmp/guest.in
-}
-
-read_qemu_dump() {
-while read line; do
-	echo "${line}" > /dev/null 2>&1
-		if [[ $line == *"$1"* ]]; then
-		break;
-		fi
-	done < /tmp/guest.out
-}
-
-
 status_check() {
 rc=$?
 if [ $rc -ne 0 ]; then
