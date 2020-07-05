@@ -19,7 +19,7 @@
  * @return the content of the file, and validate using string assertions
  */
 
-static inline char * return_string_validation()
+static inline char * malloc_first_line_of_file(const char *filename)
 {
     size_t len = 0;
     char *buffer = malloc(1);

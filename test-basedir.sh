@@ -10,15 +10,7 @@ if [ -f ./assignment-autotest/docker/options ]; then
     . ./assignment-autotest/docker/options
     parse_docker_options "$@"
 fi
-# Automate these steps from the readme:
-# Create a build subdirectory, change into it, run
-# cmake .. && make && run the assignment-autotest application
-mkdir -p build
-cd build
-cmake ..
-make
-cd ..
-./build/assignment-autotest/assignment-autotest
+./test-unit.sh
 
 # If there's a configuration for the assignment number, use this to look for
 # additional tests

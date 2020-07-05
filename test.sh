@@ -27,6 +27,7 @@ git submodule update --init --recursive
 cp -r assignment-autotest/examples .
 cp assignment-autotest/CMakeLists-parent-example.txt ./CMakeLists.txt
 cp assignment-autotest/test-basedir.sh test.sh
+cp assignment-autotest/test-unit.sh .
 cp assignment-autotest/.travis.yml .
 cp assignment-autotest/.gitlab-ci.yml .
 # Run the test script (test-basedir.sh renamed) in the base directory,
