@@ -234,13 +234,15 @@ before_script() {
 	## Run ssh-agent (inside the build environment)
 	##
 	eval $(ssh-agent -s)
-
-    if [ -n "${SSH_PRIVATE_KEY_BASE64}" ]; then
-        # See https://serverfault.com/a/978369
-        # Use this to support gitlab CI requirements for environment variable masking
-        SSH_PRIVATE_KEY=`echo ${SSH_PRIVATE_KEY_BASE64} | openssl base64 -A -d`
-        SSH_PRIVATE_KEY_BASE64=
-    fi
+	
+	
+	if [ -n "${SSH_PRIVATE_KEY_BASE64}" ]; then
+		# See https://serverfault.com/a/978369
+		# Use this to support gitlab CI requirements for environment variable masking
+		echo "Converting base64 key"
+		SSH_PRIVATE_KEY=`echo ${SSH_PRIVATE_KEY_BASE64} | openssl base64 -A -d`
+		SSH_PRIVATE_KEY_BASE64=
+	fi
 	##
 	## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
 	## We're using tr to fix line endings which makes ed25519 keys work
