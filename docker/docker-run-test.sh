@@ -10,5 +10,14 @@ if [ ! -f ${basedir_abs}/test.sh ]; then
     exit 1
 fi
 
-export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa`
-docker run -it -v ${basedir_abs}:${basedir_abs} -v /tmp:/tmp -w="${basedir_abs}" $@ cuaesd/aesd-autotest  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER}) --env SSH_PRIVATE_KEY
+if [ ! -e ~/.ssh/id_rsa_aesd_nopassword ] && [ -z "${SSH_PRIVATE_KEY}" ]; then
+    echo "Please create an ssh key with access to AESD repositories and no password"
+    echo "Then place at ~/.ssh/id_rsa_aesd_nopassword"
+    echo "Alternatively, you can define environment variable SSH_PRIVATE_KEY"
+    exit 1
+fi
+
+if [ -z "${SSH_PRIVATE_KEY}" ]; then
+    export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa_aesd_nopassword`
+fi
+docker run -it -v ${basedir_abs}:${basedir_abs} -v /tmp:/tmp --env SSH_PRIVATE_KEY -w="${basedir_abs}" $@ cuaesd/aesd-autotest  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER}) 
