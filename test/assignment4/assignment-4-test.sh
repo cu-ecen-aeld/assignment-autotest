@@ -2,11 +2,19 @@
 # 1st argument: absolute or relative path to the base directory
 # Defaults to dirname `git rev-parse --absolute-git-dir` if not specified
 
+cd `dirname $0`
+
+echo "TESTTTTTTTTTTTTTTT"
+echo $PWD
 source script-helpers
 source assignment-timeout
 
+before_script
+
 script_dir="$( cd "$(dirname "$0")" ; pwd -P )"
 testdir=$1
+echo "TESTTTTTTTTTTTTTtt"
+echo $1
 qemu_executable_path=/bin	#Path where writer,finder,tester.sh are stored
 ROOTFS_PATH=buildroot/output/target/${qemu_executable_path}		# add ${script_dir} before buildroot to make it an absolute path 
 build_success_status=1		#1 indicates false
@@ -14,7 +22,7 @@ build_again=1			#1 indicates false
 
 # Ensure we use download cache by specifying on the commandline
 export BR2_DL_DIR=/var/aesd/buildroot-shared/dl
-pushd ${testdir}
+cd ${testdir}
 
 # Remove config if it exists, to clear any previous partial runs
 rm -rf buildroot/.config
@@ -28,6 +36,7 @@ if [ $rc -eq 0 ]; then
 	sed -i 's/^AESD_ASSIGNMENTS_SITE[[:space:]]*=[[:space:]]*https:\/\/github.com\//AESD_ASSIGNMENTS_SITE = git@github.com:/g' base_external/package/aesd-assignments/aesd-assignments.mk
 fi
 
+echo $PWD
 # Validating if clean.sh exists and has executable permissions
 if [ ! -e clean.sh ]; then
 	add_validate_error "clean.sh does not exists"
