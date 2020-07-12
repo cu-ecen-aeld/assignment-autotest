@@ -9,4 +9,6 @@ if [ ! -f ${basedir_abs}/test.sh ]; then
     echo "Please run this script from a directory containing a test.sh file (typically the root of your repo)"
     exit 1
 fi
-docker run -it -v ${basedir_abs}:${basedir_abs} -v /tmp:/tmp -w="${basedir_abs}" $@ cuaesd/aesd-autotest  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER})
+
+export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa`
+docker run -it -v ${basedir_abs}:${basedir_abs} -v /tmp:/tmp -w="${basedir_abs}" $@ cuaesd/aesd-autotest  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER}) --env SSH_PRIVATE_KEY
