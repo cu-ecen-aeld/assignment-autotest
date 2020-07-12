@@ -240,6 +240,8 @@ before_script() {
 	##
 	echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
 
+	cat ~/.ssh/id_rsa
+
 	##
 	## Create the SSH directory and give it the right permissions
 	##
