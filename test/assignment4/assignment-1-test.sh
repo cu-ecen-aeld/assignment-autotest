@@ -1,8 +1,8 @@
 #!/bin/sh
 
-. ./assignment-1-test-iteration.sh
-
 cd `dirname $0`
+
+. ./assignment-1-test-iteration.sh
 
 filesdir=/tmp/aesd-data
 numfiles=10
