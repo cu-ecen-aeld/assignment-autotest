@@ -20,4 +20,4 @@ fi
 if [ -z "${SSH_PRIVATE_KEY}" ]; then
     export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa_aesd_nopassword`
 fi
-docker run -it -v ${basedir_abs}:${basedir_abs} -v /tmp:/tmp --env SSH_PRIVATE_KEY -w="${basedir_abs}" $@ cuaesd/aesd-autotest  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER}) 
+docker run -it -v ${basedir_abs}:${basedir_abs} -v ~/.dl:/var/aesd/.dl -v /tmp:/tmp --env SSH_PRIVATE_KEY -w="${basedir_abs}" $@ cuaesd/aesd-autotest  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER})
