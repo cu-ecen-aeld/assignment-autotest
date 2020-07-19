@@ -13,7 +13,8 @@ build_success_status=1		#1 indicates false
 build_again=1			#1 indicates false
 
 # Ensure we use download cache by specifying on the commandline
-export BR2_DL_DIR=/var/aesd/buildroot-shared/dl
+export BR2_DL_DIR=~/.dl
+mkdir -p ${BR2_DL_DIR}
 echo "Test directory is ${testdir}"
 pushd ${testdir}
 
@@ -71,7 +72,7 @@ fi
 validate_buildroot_config
 
 echo "Running build.sh for the first time"
-bash build.sh >/dev/null 2>&1
+bash build.sh
 rc=$?
 if [ $rc -eq 0 ]; then
 	build_success_status=0		#0 indicates true
@@ -81,7 +82,7 @@ if [ $rc -eq 0 ]; then
 
 	# Build twice since the default build.sh script didn't build after setting up the defconfig
 	echo "Running build.sh for the second time"
-	bash build.sh >/dev/null 2>&1
+	bash build.sh
 	rc=$?
 	if [ $rc -eq 0 ]; then
 		build_success_status=0		#0 indicates true
