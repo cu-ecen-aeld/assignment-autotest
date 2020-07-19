@@ -71,6 +71,9 @@ fi
 # Validating correct buildroot configuration
 validate_buildroot_config
 
+# Setup keys
+before_script
+
 echo "Running build.sh for the first time"
 bash build.sh
 rc=$?
