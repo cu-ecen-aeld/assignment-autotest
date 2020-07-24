@@ -1,0 +1,39 @@
+#!/bin/bash
+# 1st argument: absolute or relative path to the directory containing code to be tested
+pushd `dirname $0`
+
+testdir=$1
+sshkey=/opt/aesd/ssh/id_rsa_docker_ro
+# Shared directories for buildroot docker containers, to speed up 
+# download steps
+# Must match the value defined in the dockerfile
+docker_yocto_shared_dir=/var/aesd/yocto-shared
+set -e
+
+
+# set the student based on the prefix before the first _ in the test directory basename
+githubstudent=$(basename ${testdir} | sed -n 's/\(.\?\)_.*/\1/p')
+if [ -z "${githubstudent}" ]; then
+	echo "Using default github student"
+	githubstudent=aesd-classroom-default
+fi
+
+
+if [ ! -d ${docker_yocto_shared_dir} ]; then
+	sudo mkdir -p ${docker_yocto_shared_dir}
+	sudo chmod 777 ${docker_yocto_shared_dir}
+fi
+
+
+if [ ! -f ${sshkey} ]; then
+       echo "Missing SSH key at ${sshkey}, please obtain from AESD build server and copy to this location"
+       exit 1
+fi
+
+SSH_PRIVATE_KEY=`cat ${sshkey}`
+docker build --build-arg SSH_PRIVATE_KEY="${SSH_PRIVATE_KEY}" --build-arg USER_ID=$(id -u ${USER}) --build-arg GROUP_ID=$(id -g ${USER}) -t aesd-test:latest .
+docker run -t -i -v ${testdir}:${testdir} -v ${docker_yocto_shared_dir}:${docker_yocto_shared_dir} aesd-test:latest ./assignment-testing/do-test-local-timeout ${testdir} ${githubstudent}
+# Replace the line above with the line below to run a container you can attach to interactively.
+# To attach interactively, use docker ps to find the running container and then use `docker exec -it <containername> /biin/bash`
+#docker run -t -i -v ${testdir}:${testdir} -v ${docker_yocto_shared_dir}:${docker_yocto_shared_dir} aesd-test:latest
+
