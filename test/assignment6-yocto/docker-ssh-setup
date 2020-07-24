@@ -1,0 +1,11 @@
+#!/bin/bash
+# Source this script to setup docker credentials inside your docker vm
+if [ -z "${SSH_AGENT_PID}" ] && [ -f ~/.ssh/id_rsa_docker_ro ]; then
+	echo "Running from docker container without ssh agent, starting and deleting key"
+	eval `ssh-agent`
+	ssh-add ~/.ssh/id_rsa_docker_ro
+	rm -f ~/.ssh/id_rsa_docker_ro
+fi
+pushd ~
+ssh-keygen -f ".ssh/known_hosts" -R "[localhost]:10022"
+popd

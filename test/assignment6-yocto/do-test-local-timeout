@@ -1,0 +1,16 @@
+#!/bin/bash
+# This is the first script which runs inside the docker container
+
+pushd `dirname $0`
+
+source script-helpers
+source assignment-timeout
+
+
+testdir=$1
+githubstudent=$2
+timeout --foreground ${assignment_timeout} ./do-test-local ${testdir} ${githubstudent}
+rc=$?
+if [ $rc -ne 0 ]; then
+	printf "${RED}ERROR: Validation Script Timed out, could not execute all test cases${NC}\n"
+fi
