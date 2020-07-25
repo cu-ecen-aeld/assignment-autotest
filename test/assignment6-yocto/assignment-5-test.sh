@@ -2,10 +2,12 @@
 # 1st argument: absolute or relative path to the base directory
 # Defaults to dirname `git rev-parse --absolute-git-dir` if not specified
 
+cd `dirname $0`
+
 source script-helpers
 source assignment-timeout
 
-script_dir="$( cd "$(dirname "$0")" ; pwd -P )"
+script_dir="$(pwd -P )"
 testdir=$1
 qemu_executable_path=/usr/bin
 build_success_status=1		#1 indicates false
@@ -92,7 +94,7 @@ cp ${script_dir}/build.sh .
 
 # Deploying build and executing test cases if successful
 echo "Running build.sh"
-bash build.sh >/dev/null 2>&1
+build.sh >/dev/null 2>&1
 rc=$?
 if [ $rc -eq 0 ]; then
 	build_success_status=0			#0 indicates true
