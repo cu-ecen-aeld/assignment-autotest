@@ -81,7 +81,8 @@ if [ $rc -eq 0 ]; then
 	sleep 5s
 
 	# Build twice since the default build.sh script didn't build after setting up the defconfig
-	echo "Running build.sh for the second time"
+	echo "Running build.sh for the second time as user:"
+	echo `whoami`
 	bash build.sh
 	rc=$?
     echo "Build returned $rc"

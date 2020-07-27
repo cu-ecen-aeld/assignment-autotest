@@ -21,4 +21,5 @@ if [ -z "${SSH_PRIVATE_KEY}" ]; then
     echo "Setting private key based on keyfile"
     export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa_aesd_nopassword`
 fi
-docker run -it -v ${basedir_abs}:${basedir_abs} -v ~/.dl:/var/aesd/.dl -v /tmp:/tmp --env SSH_PRIVATE_KEY -w="${basedir_abs}" $@ cuaesd/aesd-autotest  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER})
+assignment=`cat ${basedir_abs}/conf/assignment.txt`
+docker run -it -v ${basedir_abs}:${basedir_abs} -v ~/.dl:/var/aesd/.dl -v /tmp:/tmp --env SSH_PRIVATE_KEY -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER})

@@ -33,7 +33,8 @@ function parse_docker_options {
         adduser aesd sudo
         echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
         ln -s /var/aesd/.dl /home/aesd/.dl
-        # This runs the rest of the script as the "aesd" user
+        # This runs the rest of the script as the "aesd" user and exits with rc specified
         sudo -E -s -u aesd HOME=/home/aesd $0
+        exit $?
     fi
 }
