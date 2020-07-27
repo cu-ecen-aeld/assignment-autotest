@@ -243,21 +243,31 @@ before_script() {
 		SSH_PRIVATE_KEY=`echo ${SSH_PRIVATE_KEY_BASE64} | openssl base64 -A -d`
 		SSH_PRIVATE_KEY_BASE64=
 	fi
-	##
-	## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
-	## We're using tr to fix line endings which makes ed25519 keys work
-	## without extra base64 encoding.
-	## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
-	##
-	echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-	# Now that we don't need the private key anymore zero it out
-	export SSH_PRIVATE_KEY=
 
+    if [ -z "${SSH_PRIVATE_KEY}" ]; then
+        echo "Private key is not set, attempts to clone will fail"
+    else
+        echo "Setting private key"
+        set -e
+        ##
+        ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+        ## We're using tr to fix line endings which makes ed25519 keys work
+        ## without extra base64 encoding.
+        ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
+        ##
+        echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+        set +e
+        # Now that we don't need the private key anymore zero it out
+        export SSH_PRIVATE_KEY=
+    fi
+
+    echo "Running as:"
+    echo `whoami`
 	##
 	## Create the SSH directory and give it the right permissions
 	##
 	mkdir -p ~/.ssh
-	chmod 700 ~/.ssh
+	chmod 775 ~/.ssh
 
 	##
 	## Optionally, if you will be using any Git commands, set the user name and

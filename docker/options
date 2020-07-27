@@ -34,7 +34,6 @@ function parse_docker_options {
         echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
         ln -s /var/aesd/.dl /home/aesd/.dl
         # This runs the rest of the script as the "aesd" user
-        # see trick at https://stackoverflow.com/a/29969243/1446624
-        exec su aesd $0
+        sudo -E -s -u aesd HOME=/home/aesd $0
     fi
 }
