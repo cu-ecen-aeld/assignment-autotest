@@ -10,10 +10,11 @@ if [ ! -f ${basedir_abs}/test.sh ]; then
     exit 1
 fi
 
-if [ ! -e ~/.ssh/id_rsa_aesd_nopassword ] && [ -z "${SSH_PRIVATE_KEY}" ]; then
+if [ ! -e ~/.ssh/id_rsa_aesd_nopassword ] && [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}"; then
     echo "Please create an ssh key with access to AESD repositories and no password"
     echo "Then place at ~/.ssh/id_rsa_aesd_nopassword"
-    echo "Alternatively, you can define environment variable SSH_PRIVATE_KEY"
+    echo "Alternatively, you can define environment variable SSH_PRIVATE_KEY or SSH_PRIVATE_KEY_BASE64 with"
+    echo "the content of the ssh private key or base64uuencoded prviate key"
     exit 1
 fi
 
@@ -24,4 +25,5 @@ fi
 assignment=`cat ${basedir_abs}/conf/assignment.txt`
 touch ${basedir_abs}/test.sh.log
 docker_volumes="-v ${basedir_abs}:${basedir_abs} -v ${HOME}/.dl:/var/aesd/.dl -v /tmp:/tmp -v ${basedir_abs}/test.sh.log:${basedir_abs}/test.sh.log"
-docker run -it ${docker_volumes} --env SSH_PRIVATE_KEY -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER})
+docker_environment="--env SSH_PRIVATE_KEY --env SSH_PRIVATE_KEY_BASE64"
+docker run -it ${docker_volumes} ${docker_environment} -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER})
