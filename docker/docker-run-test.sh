@@ -35,4 +35,5 @@ if [ $uid -ne 0 ]; then
     # outside a docker container
     docker_userargs="-i $(id -u ${USER}) -g $(id -g ${USER})"
 fi
+set -x
 docker run ${docker_volumes} ${docker_environment} -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ./test.sh  ${docker_userargs}
