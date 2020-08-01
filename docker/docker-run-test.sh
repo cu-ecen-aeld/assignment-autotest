@@ -14,11 +14,11 @@ if [ ! -e ~/.ssh/id_rsa_aesd_nopassword ] && [ -z "${SSH_PRIVATE_KEY}" ] && [ -z
     echo "Please create an ssh key with access to AESD repositories and no password"
     echo "Then place at ~/.ssh/id_rsa_aesd_nopassword"
     echo "Alternatively, you can define environment variable SSH_PRIVATE_KEY or SSH_PRIVATE_KEY_BASE64 with"
-    echo "the content of the ssh private key or base64uuencoded prviate key"
+    echo "the content of the ssh private key or base64 uuencoded prviate key"
     exit 1
 fi
 
-if [ -z "${SSH_PRIVATE_KEY}" ]; then
+if [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}" ]; then
     echo "Setting private key based on keyfile"
     export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa_aesd_nopassword`
 fi
