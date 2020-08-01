@@ -22,4 +22,6 @@ if [ -z "${SSH_PRIVATE_KEY}" ]; then
     export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa_aesd_nopassword`
 fi
 assignment=`cat ${basedir_abs}/conf/assignment.txt`
-docker run -it -v ${basedir_abs}:${basedir_abs} -v ~/.dl:/var/aesd/.dl -v /tmp:/tmp --env SSH_PRIVATE_KEY -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER})
+touch ${basedir_abs}/test.sh.log
+docker_volumes="-v ${basedir_abs}:${basedir_abs} -v ${HOME}/.dl:/var/aesd/.dl -v /tmp:/tmp -v ${basedir_abs}/test.sh.log:${basedir_abs}/test.sh.log"
+docker run -it ${docker_volumes} --env SSH_PRIVATE_KEY -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER})
