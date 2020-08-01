@@ -10,7 +10,7 @@ if [ ! -f ${basedir_abs}/test.sh ]; then
     exit 1
 fi
 
-if [ ! -e ~/.ssh/id_rsa_aesd_nopassword ] && [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}"; then
+if [ ! -e ~/.ssh/id_rsa_aesd_nopassword ] && [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}" ]; then
     echo "Please create an ssh key with access to AESD repositories and no password"
     echo "Then place at ~/.ssh/id_rsa_aesd_nopassword"
     echo "Alternatively, you can define environment variable SSH_PRIVATE_KEY or SSH_PRIVATE_KEY_BASE64 with"
