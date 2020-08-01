@@ -26,4 +26,13 @@ assignment=`cat ${basedir_abs}/conf/assignment.txt`
 touch ${basedir_abs}/test.sh.log
 docker_volumes="-v ${basedir_abs}:${basedir_abs} -v ${HOME}/.dl:/var/aesd/.dl -v /tmp:/tmp -v ${basedir_abs}/test.sh.log:${basedir_abs}/test.sh.log"
 docker_environment="--env SSH_PRIVATE_KEY --env SSH_PRIVATE_KEY_BASE64"
-docker run ${docker_volumes} ${docker_environment} -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ./test.sh --i $(id -u ${USER}) -g $(id -g ${USER})
+uid=$(id -u ${USER})
+docker_userargs=
+if [ $uid -ne 0 ]; then
+    # If we are running as a non root account (ie not inside a docker container)
+    # specify user arguments we can use to run as the same user inside the container
+    # This allows us to share build content and support incremental builds inside or
+    # outside a docker container
+    docker_userargs="-i $(id -u ${USER}) -g $(id -g ${USER})"
+fi
+docker run ${docker_volumes} ${docker_environment} -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ./test.sh  ${docker_userargs}
