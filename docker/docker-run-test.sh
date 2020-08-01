@@ -23,8 +23,7 @@ if [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}" ]; then
     export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa_aesd_nopassword`
 fi
 assignment=`cat ${basedir_abs}/conf/assignment.txt`
-touch ${basedir_abs}/test.sh.log
-docker_volumes="-v ${basedir_abs}:${basedir_abs} -v ${HOME}/.dl:/var/aesd/.dl -v /tmp:/tmp -v ${basedir_abs}/test.sh.log:${basedir_abs}/test.sh.log"
+docker_volumes="-v ${basedir_abs}:${basedir_abs} -v ${HOME}/.dl:/var/aesd/.dl -v /tmp:/tmp"
 docker_environment="--env SSH_PRIVATE_KEY --env SSH_PRIVATE_KEY_BASE64"
 uid=$(id -u ${USER})
 docker_userargs=
