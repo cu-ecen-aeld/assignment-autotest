@@ -32,8 +32,6 @@ if [[ -z ${DO_VALIDATE} || ${DO_VALIDATE} -eq 1 ]]; then
 	# Validating test cases inside qemu
 	validate_assignment2_checks "${script_dir}" "${qemu_executable_path}"
 
-    add_validate_error "catchme"
-
 	echo "Killing qemu"
 	killall qemu-system-aarch64
 	popd
