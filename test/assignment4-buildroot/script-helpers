@@ -121,19 +121,6 @@ validate_makefile_flags() {
 }
 
 
-# This function validates if writer, finder.sh and tester.sh are present in the correct directory
-# @parameter1: The path where the executables inside qemu are present. i.e path in aesd-assignments.mk file
-validate_executables() {
-	ROOTFS_PATH=buildroot/output/target/${1}
-
-	if [ ! -e ${ROOTFS_PATH}/writer ]; then
-		add_validate_error "writer executable not found in ${1}"
-	else
-		echo "writer executable already exists"
-	fi
-}
-
-
 # This function copies the required file to the directory ~/assignment4_build_binaries/<basename ${1}>
 # @parameter1: This parameter is the path to the root directory of the github repository.
 save_build_binaries() {
