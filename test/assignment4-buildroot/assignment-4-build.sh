@@ -7,7 +7,7 @@ source assignment-timeout
 
 script_dir="$(pwd -P )"
 testdir=$1
-qemu_executable_path=/bin	#Path where writer,finder,tester.sh are stored
+qemu_executable_path=/usr/bin	#Path where writer,finder,tester.sh are stored
 ROOTFS_PATH=buildroot/output/target/${qemu_executable_path}		# add ${script_dir} before buildroot to make it an absolute path 
 build_again=1			#1 indicates false
 

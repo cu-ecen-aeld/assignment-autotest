@@ -9,7 +9,7 @@ source assignment-timeout
 
 script_dir="$(pwd -P )"
 testdir=$1
-qemu_executable_path=/bin	#Path where writer,finder,tester.sh are stored
+qemu_executable_path=/usr/bin	#Path where writer,finder,tester.sh are stored
 
 # Invoke docker script with --env SKIP_BUILD=1 --env DO_VALIDATE=1 to perform a validation only
 # test
