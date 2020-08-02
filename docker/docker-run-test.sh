@@ -24,7 +24,7 @@ if [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}" ]; then
 fi
 assignment=`cat ${basedir_abs}/conf/assignment.txt`
 docker_volumes="-v ${basedir_abs}:${basedir_abs} -v ${HOME}/.dl:/var/aesd/.dl -v /tmp:/tmp"
-docker_environment="--env SSH_PRIVATE_KEY --env SSH_PRIVATE_KEY_BASE64"
+docker_environment="--env SSH_PRIVATE_KEY --env SSH_PRIVATE_KEY_BASE64 --env DO_VALIDATE --env SKIP_BUILD"
 uid=$(id -u ${USER})
 docker_userargs=
 if [ $uid -ne 0 ]; then
