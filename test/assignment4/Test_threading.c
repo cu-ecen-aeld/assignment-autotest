@@ -36,7 +36,7 @@ static void validate_thread_joinable_after_mutex_unlock(pthread_t *thread,unsign
 
     TEST_ASSERT_NOT_NULL_MESSAGE(thread_rtn,"The thread function should not have returned a null pointer");
     if( thread_rtn ) {
-        struct thread_data_t* thread_func_data = (struct thread_data_t *) thread_rtn;
+        struct thread_data* thread_func_data = (struct thread_data *) thread_rtn;
         TEST_ASSERT_TRUE_MESSAGE(thread_func_data->thread_complete_success,
                 "The thread_complete_success value should be set to true in the thread return structure");
         free(thread_rtn);
@@ -221,5 +221,3 @@ void test_threading_two_threads_one_mutex()
         validate_thread_joinable_after_mutex_unlock(&thread2,0);
     }
 }
-
-
