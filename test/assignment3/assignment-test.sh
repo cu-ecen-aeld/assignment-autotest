@@ -1,4 +1,11 @@
 #!/bin/bash
+
+./test-unit.sh
+rc=$?
+if [ $rc -ne 0 ]; then
+    echo "Unit tests failed, skipping additional validation"
+    exit $rc
+fi
 cd `dirname $0`
 source ./script-helpers
 scriptsdir=`pwd`

@@ -72,22 +72,28 @@ void test_exec_redirect_calls()
     printf("Running tests at %s : function %s\n",__FILE__,__func__);
     do_exec_redirect(REDIRECT_FILE, 3, "/bin/sh", "-c", "echo home is $HOME");
     char *test_string = malloc_first_line_of_file(REDIRECT_FILE);
-    int test_value = strncmp(test_string, "home is /", 9);
-    printf("execv /bin/sh -c echo home is $HOME returned %s\n", test_string);
-    // Testing implementation with testfile.txt output 
-    TEST_ASSERT_EQUAL_INT16_MESSAGE(test_value, 0,
-            "The first 9 chars echoed should be \"home is /\".  The last chars will include "
-            "the content of the $HOME variable");
-    test_value = strncmp(test_string, "home is $HOME", 9);
-    TEST_ASSERT_NOT_EQUAL_INT16_MESSAGE(test_value, 0,
-            "The $HOME parameter should be expanded when using /bin/sh with do_exec()");
-    free(test_string);
+    TEST_ASSERT_NOT_NULL_MESSAGE(test_string,"Nothing written to file at " REDIRECT_FILE );
+    if( test_string != NULL ) {
+        int test_value = strncmp(test_string, "home is /", 9);
+        printf("execv /bin/sh -c echo home is $HOME returned %s\n", test_string);
+        // Testing implementation with testfile.txt output 
+        TEST_ASSERT_EQUAL_INT16_MESSAGE(test_value, 0,
+                "The first 9 chars echoed should be \"home is /\".  The last chars will include "
+                "the content of the $HOME variable");
+        test_value = strncmp(test_string, "home is $HOME", 9);
+        TEST_ASSERT_NOT_EQUAL_INT16_MESSAGE(test_value, 0,
+                "The $HOME parameter should be expanded when using /bin/sh with do_exec()");
+        free(test_string);
+    }
 
     do_exec_redirect(REDIRECT_FILE, 2, "/bin/echo", "home is $HOME");
     test_string = malloc_first_line_of_file(REDIRECT_FILE);
-    printf("execv /bin/echo home is $HOME returned %s\n", test_string);
-    // Testing implementation with testfile.txt output 
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("home is $HOME", test_string, 
-                "The variable $HOME should not be expanded using execv()");
-    free(test_string);
+    TEST_ASSERT_NOT_NULL_MESSAGE(test_string,"Nothing written to file at " REDIRECT_FILE );
+    if( test_string != NULL ) {
+        printf("execv /bin/echo home is $HOME returned %s\n", test_string);
+        // Testing implementation with testfile.txt output 
+        TEST_ASSERT_EQUAL_STRING_MESSAGE("home is $HOME", test_string, 
+                    "The variable $HOME should not be expanded using execv()");
+        free(test_string);
+    }
 }
