@@ -22,10 +22,9 @@
 static inline char * malloc_first_line_of_file(const char *filename)
 {
     size_t len = 0;
-    char *buffer = malloc(1);
+    char *buffer = NULL;
     FILE *fp = fopen("testfile.txt","r");
     ssize_t bytes_read = -1;
-    buffer[0] = 0;
     if ( fp != NULL ) {
         /**
          * See https://www.gnu.org/software/libc/manual/html_mono/libc.html#index-getdelim-994
