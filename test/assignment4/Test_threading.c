@@ -14,7 +14,7 @@
 static void validate_thread_joinable_after_mutex_unlock(pthread_t *thread,unsigned int sleep_before_check_ms)
 {
     int tryjoin_rtn = 0;
-    void * thread_rtn;
+    void * thread_rtn = NULL;
     if (sleep_before_check_ms > 0 ) {
         /**
          * Sleep for 20 * the amount of sleep before lock to
@@ -27,13 +27,22 @@ static void validate_thread_joinable_after_mutex_unlock(pthread_t *thread,unsign
 
     tryjoin_rtn = pthread_tryjoin_np(*thread,&thread_rtn);
     if( tryjoin_rtn != 0 ) {
-        printf("Thread is not joinable after a delay of %d ms.  If the test hangs at the next step, assume you haven't\n"
+        printf("WARNING!!!! - Thread is not joinable after a delay of %d ms.  If the test hangs at the next step, assume you haven't\n"
                 "correctly implemented threading logic and your thread is not actually exiting after locking the mutex.\n",
                 sleep_before_check_ms);
-    }
-    TEST_ASSERT_EQUAL_INT_MESSAGE(0,pthread_join(*thread,&thread_rtn),
+        TEST_ASSERT_EQUAL_INT_MESSAGE(0,pthread_join(*thread,&thread_rtn),
                 "The thread should be able to be joined after mutex is unlocked");
+    }
+
+    TEST_ASSERT_NOT_NULL_MESSAGE(thread_rtn,"The thread function should not have returned a null pointer");
+    if( thread_rtn ) {
+        struct thread_data_t* thread_func_data = (struct thread_data_t *) thread_rtn;
+        TEST_ASSERT_TRUE_MESSAGE(thread_func_data->thread_complete_success,
+                "The thread_complete_success value should be set to true in the thread return structure");
+        free(thread_rtn);
+    }
 }
+
 
 /**
  * Validate the thread @param thread correctly handles mutex unlock assuming it's sleeping
