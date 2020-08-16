@@ -1,4 +1,12 @@
 #!/bin/bash
-# 1st argument: absolute or relative path to the base directory
-# Defaults to dirname `git rev-parse --absolute-git-dir` if not specified
-./test-unit.sh
+testdir=$1
+pushd `dirname $0`
+scriptdir=$(pwd -P)
+source script-helpers
+
+validate_assignment6_native "${scriptdir}" "${testdir}"
+
+if [ ! -z "${validate_error}" ]; then
+    echo "Validation failed with error list ${validate_error}"
+    exit 1
+fi
