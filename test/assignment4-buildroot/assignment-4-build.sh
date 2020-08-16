@@ -7,9 +7,8 @@ source assignment-timeout
 
 script_dir="$(pwd -P )"
 testdir=$1
-qemu_executable_path=/bin	#Path where writer,finder,tester.sh are stored
+qemu_executable_path=/usr/bin	#Path where writer,finder,tester.sh are stored
 ROOTFS_PATH=buildroot/output/target/${qemu_executable_path}		# add ${script_dir} before buildroot to make it an absolute path 
-build_success_status=1		#1 indicates false
 build_again=1			#1 indicates false
 
 # Ensure we use download cache by specifying on the commandline
@@ -71,39 +70,34 @@ fi
 # Validating correct buildroot configuration
 validate_buildroot_config
 
+# Setup keys
+before_script
+
 echo "Running build.sh for the first time"
 bash build.sh
 rc=$?
 if [ $rc -eq 0 ]; then
-	build_success_status=0		#0 indicates true
-
 	#Inserting a time delay of 5s
 	sleep 5s
 
 	# Build twice since the default build.sh script didn't build after setting up the defconfig
-	echo "Running build.sh for the second time"
+	echo "Running build.sh for the second time as user:"
+	echo `whoami`
 	bash build.sh
 	rc=$?
-	if [ $rc -eq 0 ]; then
-		build_success_status=0		#0 indicates true
-	else
-		build_success_status=1		#1 indicates false
-	fi
-else
-	build_success_status=1			#1 indicates false
+    echo "Build returned $rc"
 fi
-
 
 # Validating if finder.sh and tester.sh exists, are sh scripts, have executable permissions.
 # Bash is not available in buildroot.
 # Building again if any changes are made.
-if [ $build_success_status -eq 0 ]; then
+if [ $rc -eq 0 ]; then
 	echo "Checking if finder.sh and tester.sh are sh or bash scripts."
 
 	if [ ! -e ${ROOTFS_PATH}/tester.sh ]; then
 		add_validate_error "tester.sh does not exists in ${qemu_executable_path} inside qemu"
 	else
-		echo "Tester.sh exists in ${qemu_executable_path} inside qemu"
+		echo "tester.sh exists in ${qemu_executable_path} inside qemu"
 		if [ ! -x ${ROOTFS_PATH/tester.sh} ]; then
 			add_validate_error "tester.sh does not have executable permissions"
 			echo "Setting executable permissions for tester.sh"
@@ -148,19 +142,15 @@ if [ $build_success_status -eq 0 ]; then
 
 	if [ $build_again -eq 0 ]; then
 		echo "Running build.sh again due to modifications in tester.sh/finder.sh script"
-		bash build.sh >/dev/null 2>&1
-		rc=$?
-		if [ $rc -eq 0 ]; then
-			build_success_status=0		#0 indicates true
-		else
-			build_success_status=1		#1 indicates false
-		fi
+		bash build.sh
+        rc=$?
+		if [ $rc -ne 0 ]; then
+	        add_validate_error "Build script failed with error $rc after tester and finder script modifications"
+        fi
 	fi
+else
+	add_validate_error "Build script failed with error $rc"
 fi
-
-
-# Running test cases if build is successful
-if [ $build_success_status -ne 0 ]; then
-	add_validate_error "Build script failed with error $build_success_status"
-fi
+# Use this to test validation errors are actually caught and handled properly
+#add_validate_error "Testing validation error"
 popd

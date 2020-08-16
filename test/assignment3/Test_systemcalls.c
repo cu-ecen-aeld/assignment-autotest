@@ -1,6 +1,7 @@
 #include "unity.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../../../examples/systemcalls/systemcalls.h"
 #include "file_write_commands.h"
 
