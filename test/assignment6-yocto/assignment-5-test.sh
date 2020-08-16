@@ -94,7 +94,7 @@ cp ${script_dir}/build.sh .
 
 # Deploying build and executing test cases if successful
 echo "Running build.sh"
-build.sh >/dev/null 2>&1
+./build.sh
 rc=$?
 if [ $rc -eq 0 ]; then
 	build_success_status=0			#0 indicates true
