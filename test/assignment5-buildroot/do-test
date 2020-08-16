@@ -1,0 +1,56 @@
+#!/bin/bash
+# 1st argument: absolute or relative path to the base directory
+# Defaults to dirname `git rev-parse --absolute-git-dir` if not specified
+pushd `dirname $0`
+source script-helpers
+testdir=$1
+timeout=90m
+if [ $# -lt 1 ]; then
+	testdir=$(dirname $(git rev-parse --absolute-git-dir))
+	echo "Directory not specified, using ${testdir}"
+fi
+
+cp sockettest.sh ${testdir}
+pushd ${testdir}
+
+grep "^AESD_ASSIGNMENTS_SITE[[:space:]]*=[[:space:]]*https" base_external/package/aesd-assignments/aesd-assignments.mk
+if [ $? -eq 0 ]; then
+	add_validate_error "Using https instead of ssh URL on aesd assignments, will not build automated"
+	sed -i 's/^AESD_ASSIGNMENTS_SITE[[:space:]]*=[[:space:]]*https:\/\/github.com\//AESD_ASSIGNMENTS_SITE = git@github.com:/g' base_external/package/aesd-assignments/aesd-assignments.mk
+fi
+
+if [ ! -x clean.sh ]; then
+	add_validate_error "clean.sh is not executable"
+	chmod a+x clean.sh
+fi
+# don't run clean.sh, since it doesn't work before build
+if [ ! -x build.sh ]; then
+	add_validate_error "build.sh is not executable"
+	chmod a+x build.sh
+fi
+timeout ${timeout} ./build.sh
+if [ $? -ne 0 ]; then
+	add_validate_error "build script failed with error $?"
+else
+	pushd ${testdir}
+	# Build twice since the default build.sh script didn't build after setting up the defconfig
+	timeout ${timeout} ./build.sh
+	if [ $? -ne 0 ]; then
+		add_validate_error "build script failed with error $?"
+	fi
+fi
+if [ ! -e runqemu.sh ]; then
+	if [ -e runquemu.sh ]; then
+		echo "Moving runquemu.sh to runqemu.sh due to problem with assignment document"
+		mv runquemu.sh runqemu.sh
+	fi
+fi
+./runqemu.sh &
+validate-qemu
+killall qemu-system-aarch64
+if [ ! "${validate_error}" == "" ]; then
+	echo "Validation script failed with ${validate_error}"
+	exit 1
+fi
+echo "No validation failures, script completed successfully"
+exit 0

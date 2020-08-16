@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Set this with a string describing the validation error(s) if any occur
+validate_error=
+
+function add_validate_error {
+	validate_error="${validate_error}:$1"
+	echo "Validation Error:$1"
+}
+function wait-for-qemu {
+	echo "TODO: poll for up to 1 minute waiting for successful ssh login, exit 1 if failed"
+	sleep 60
+}
+
+function validate-qemu {
+	wait-for-qemu
+	echo "TODO: perform additional qemu validation"
+	./sockettest.sh
+	if [ $? -ne 0 ]; then
+		add_validate_error "sockettest.sh failed when running on qemu instance"
+	fi
+}

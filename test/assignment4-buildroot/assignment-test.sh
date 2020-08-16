@@ -5,7 +5,6 @@
 cd `dirname $0`
 
 source script-helpers
-source assignment-timeout
 
 script_dir="$(pwd -P )"
 testdir=$1
