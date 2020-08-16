@@ -266,3 +266,17 @@ before_script() {
 	#- git config --global user.email "user@example.com"
 	#- git config --global user.name "User name"
 }
+
+
+# Validate the assignment 5 implementation against a running qemu instance
+# This means making sure we can run sockettest.sh against qemu after startup
+validate_assignment5_qemu() {
+	script_dir=${1}
+    pushd ${script_dir}
+    ./sockettest.sh
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        add_validate_error "sockettest.sh returned $rc attempting to run against qemu instance"
+    fi
+    popd
+}
