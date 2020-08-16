@@ -1,6 +1,5 @@
 #!/bin/bash
 # 1st argument: absolute or relative path to the base directory
-# Defaults to dirname `git rev-parse --absolute-git-dir` if not specified
 
 cd `dirname $0`
 
@@ -14,7 +13,7 @@ qemu_executable_path=/usr/bin	#Path where writer,finder,tester.sh are stored
 # test
 echo "starting test with SKIP_BUILD ${SKIP_BUILD} and DO_VALIDATE ${DO_VALIDATE}"
 if [[ -z ${SKIP_BUILD} || ${SKIP_BUILD} -eq 0 ]]; then
-    . ./assignment-4-build.sh ${testdir}
+    . ./assignment-5-build.sh ${testdir}
     rc=$?
     echo "build step complete with status $?"
     echo "Validation errors ${validate_error}"
@@ -29,7 +28,7 @@ if [[ -z ${DO_VALIDATE} || ${DO_VALIDATE} -eq 1 ]]; then
 	validate_qemu
 
 	# Validating test cases inside qemu
-	validate_assignment2_checks "${script_dir}" "${qemu_executable_path}"
+	validate_assignment5_qemu "${script_dir}"
 
 	echo "Killing qemu"
 	killall qemu-system-aarch64
