@@ -1,7 +1,8 @@
-# !/bin/bash
-# Tester script for sockets using Netcat
+#!/bin/bash
+# Tester script for Multithreaded server with periodic timestamp using Netcat
+# Note: This script has to be executed only once after running the server
+# Author : Steve Kennedy
 
-pushd `dirname $0`
 target=localhost
 port=9000
 function printusage
@@ -15,7 +16,7 @@ function printusage
 
 while getopts "t:p:" opt; do
 	case ${opt} in
-		h )
+		t )
 			target=$OPTARG
 			;;
 		p )
@@ -46,15 +47,31 @@ function test_send_socket_string
 {
 	string=$1
 	prev_file=$2
-	new_file=`tempfile`
-	expected_file=`tempfile`
-
-	echo "sending string ${string} to ${target} on port ${port}"
-	echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
-	cp ${prev_file} ${expected_file}
-	echo ${string} >> ${expected_file}
 	
-	diff ${expected_file} ${new_file} > /dev/null
+	new_file=`tempfile`
+	file_wo_ts="tempfile_wo_ts.txt"
+
+	expected_file=`tempfile`
+	if [ "$string" = 'send_file' ]; then
+		echo "sending a large test file"
+		nc ${target} ${port} -w 1 < long_string.txt > ${new_file}
+
+		grep -vwE "(timestamp)" ${new_file} > ${file_wo_ts}
+
+		cp ${prev_file} ${expected_file}
+		cat long_string.txt >> ${expected_file}
+
+	else
+		echo "sending string $string"
+		echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
+
+		grep -vwE "(timestamp)" ${new_file} > ${file_wo_ts}
+
+		cp ${prev_file} ${expected_file}
+		echo ${string} >> ${expected_file}
+	fi
+
+	diff ${expected_file} ${file_wo_ts} > /dev/null
 	if [ $? -ne 0 ]; then
 		echo "Differences found after sending ${string} to ${target} on port ${port}"
 		echo "Expected contents to match:"
@@ -63,12 +80,15 @@ function test_send_socket_string
 		cat ${new_file}
 		echo "With differences"
 		diff -u ${expected_file} ${new_file}
-		echo "Test complete with failure"
-		exit 1
+		echo "Test complete with failure. Make sure you run this script before sending any data to server"
+		return 1
+
 	else
 		cp ${expected_file} ${prev_file}
 		rm ${new_file}
-		rm ${expected_file}
+		rm ${expected_file}		
+		rm ${file_wo_ts}
+		
 	fi
 }
 
@@ -93,14 +113,13 @@ function test_socket_timer
 	echo "No of timestamps expected after a delay of ${delay_secs} seconds is ${expected_timestamps}"
 
 	sleep ${delay_secs}
-	echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
 
+	echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
 	verify_timestamps=$(grep -c "timestamp:" ${new_file})
 	echo "No of timestamps found in file: ${verify_timestamps}"
 
 	if [ ${verify_timestamps} -ge ${expected_timestamps} ]; then
 		rm ${new_file}
-		
 	else
 		echo "Differences found in the number of timestamps occurances"
 		echo "Test complete with failure. Check your timer functionality"
@@ -129,7 +148,7 @@ function test_socket_thread2
 }
 
 function test_socket_thread3
-{	
+{
 	for i in {1..20}
 	do
 		echo ${string3} | nc ${target} ${port} -w 1  > /dev/null
@@ -150,7 +169,7 @@ function validate_multithreaded
 
 	if [ ${count_thread1} -eq 20 ] && [ ${count_thread2} -eq 20 ] && [ ${count_thread3} -eq 20 ]; then
 		echo "**** END OF TEST CASES ****"
-		
+	
 	else
 		if [ ${count_thread1} -ne 20 ]; then
 			echo "Found $count_thread1 instance of string -> $string1 "
@@ -189,10 +208,7 @@ test_send_socket_string "Harry Potter" ${comparefile}
 test_send_socket_string "You may find the worst enemy or best friend in yourself." ${comparefile}
 test_send_socket_string "The beauty of Taj Mahal is mind blowing" ${comparefile}
 test_send_socket_string "Canberra is awesome" ${comparefile}
-
-echo "Sending long string from long_string.txt file"
-sendstring=`cat long_string.txt`
-test_send_socket_string ${sendstring} ${comparefile}
+test_send_socket_string "send_file" ${comparefile}
 
 sleep 2s
 
@@ -200,8 +216,6 @@ test_send_socket_string "Courage is the first of human qualities because it is t
 test_send_socket_string "Live each day as if your life had just begun" ${comparefile}
 test_send_socket_string "What does a man project if he gains the whole world but loses his own soul" ${comparefile}
 
-echo "Full contents sent:"
-cat ${comparefile}
 rm ${comparefile}
 
 echo ""
