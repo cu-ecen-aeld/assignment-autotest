@@ -280,3 +280,33 @@ validate_assignment5_qemu() {
     fi
     popd
 }
+
+# Validate the assignment 5 implementation against native code
+# This means compiling natively, then starting aesdsocket as daemon, then
+# running sockettest.sh against the running instance
+# Arguments: 1) The script directory containing the sockettest executable
+#            2) The source directory containing the aesdsocket application source code and makefile
+validate_assignment5_native() {
+	script_dir=${1}
+    source_dir=${2}
+    pushd ${source_dir}
+    make clean && make
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        add_validate_error "make returned $rc attempting to build native application"
+    fi
+    ./aesdsocket -d
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        add_validate_error "starting aesdocket failed with $rc"
+    fi
+    pushd ${script_dir}
+    ./sockettest.sh
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        add_validate_error "sockettest.sh returned $rc attempting to run against native compiled aesdsocket instance"
+    fi
+    pkill aesdsocket
+    popd
+    popd
+}
