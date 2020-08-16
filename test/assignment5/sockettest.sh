@@ -1,9 +1,9 @@
 # !/bin/bash
 # Tester script for sockets using Netcat
 
+pushd `dirname $0`
 target=localhost
 port=9000
-Completed_required_TC=0
 function printusage
 {
 	echo "Usage: $0 [-t target_ip] [-p port]"
@@ -48,18 +48,10 @@ function test_send_socket_string
 	new_file=`tempfile`
 	expected_file=`tempfile`
 
-	if [ "$string" = 'send_file' ]; then
-		echo "sending the test file"
-		nc ${target} ${port} -w 1 < long_string.txt > ${new_file}
-		cp ${prev_file} ${expected_file}
-		cat long_string.txt >> ${expected_file}
-	else
-		echo "sending short strings"
-		echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
-		cp ${prev_file} ${expected_file}
-		echo ${string} >> ${expected_file}
-	fi
-
+	echo "sending string ${string} to ${target} on port ${port}"
+	echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
+	cp ${prev_file} ${expected_file}
+	echo ${string} >> ${expected_file}
 	
 	diff ${expected_file} ${new_file} > /dev/null
 	if [ $? -ne 0 ]; then
@@ -71,12 +63,7 @@ function test_send_socket_string
 		echo "With differences"
 		diff -u ${expected_file} ${new_file}
 		echo "Test complete with failure"
-
-		if [ "$Completed_required_TC"==1 ]; then
-			exit 2
-		else
-			exit 1
-		fi
+		exit 1
 	else
 		cp ${expected_file} ${prev_file}
 		rm ${new_file}
@@ -89,10 +76,10 @@ test_send_socket_string "abcdefg" ${comparefile}
 test_send_socket_string "hijklmnop" ${comparefile}
 test_send_socket_string "1234567890" ${comparefile}
 test_send_socket_string "9876543210" ${comparefile}
-Completed_required_TC=1
-# ---- Extra Test cases ----------#
-test_send_socket_string "send_file" ${comparefile}
-
+echo "Sending long string from long_string.txt file"
+sendstring=`cat long_string.txt`
+test_send_socket_string ${sendstring} ${comparefile}
+echo "Full contents sent:"
 cat ${comparefile}
 rm ${comparefile}
-echo "Tests complete with success, last response from server was"
+echo "Tests complete with success!"
