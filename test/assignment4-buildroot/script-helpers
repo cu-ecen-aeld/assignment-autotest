@@ -95,24 +95,25 @@ validate_buildroot_config() {
 validate_makefile_flags() {
 	echo "validating makefile Flags"
 
-	commit_id=$(grep "AESD_ASSIGNMENTS_VERSION" base_external/package/aesd-assignments/aesd-assignments.mk | cut -d "=" -f2 | tr -d ' ')
-	MAKEFILE_PATH=buildroot/output/build/aesd-assignments-${commit_id}
+	commit_id=$(grep "SRCREV" meta-aesd/recipes-aesd-assignments/aesd-assignments/aesd-assignments_git.bb | cut -d'"' -f2)
+	short_commit_id=$(echo ${commit_id} | head -c 10)
+	MAKEFILE_PATH=build/tmp/work/aarch64-poky-linux/aesd-assignments/1.0+gitAUTOINC+${short_commit_id}-r0/git
 
 
-	grep -is "wall" ${MAKEFILE_PATH}/makefile
+	grep -i "wall" ${MAKEFILE_PATH}/makefile
 	rc=$?
 	if [ $rc -ne 0 ]; then
-		grep -is "wall" ${MAKEFILE_PATH}/Makefile
+		grep -i "wall" ${MAKEFILE_PATH}/Makefile
 		rc=$?
 		if [ $rc -ne 0 ]; then
 			add_validate_error "wall flag missing in Makefile"
 		fi
 	fi
 
-	grep -is "Werror" ${MAKEFILE_PATH}/makefile
+	grep -i "Werror" ${MAKEFILE_PATH}/makefile
 	rc=$?
 	if [ $rc -ne 0 ]; then
-		grep -is "Werror" ${MAKEFILE_PATH}/Makefile
+		grep -i "Werror" ${MAKEFILE_PATH}/Makefile
 		rc=$?
 		if [ $rc -ne 0 ]; then
 			add_validate_error "Werror flag missing"

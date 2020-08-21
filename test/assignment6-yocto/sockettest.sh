@@ -52,24 +52,16 @@ function test_send_socket_string
 	file_wo_ts="tempfile_wo_ts.txt"
 
 	expected_file=`tempfile`
-	if [ "$string" = 'send_file' ]; then
-		echo "sending a large test file"
-		nc ${target} ${port} -w 1 < long_string.txt > ${new_file}
 
-		grep -vwE "(timestamp)" ${new_file} > ${file_wo_ts}
+	echo "sending string $string"
+	echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
 
-		cp ${prev_file} ${expected_file}
-		cat long_string.txt >> ${expected_file}
+	grep -vwE "(timestamp)" ${new_file} > ${file_wo_ts}
 
-	else
-		echo "sending string $string"
-		echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
+	cp ${prev_file} ${expected_file}
+	echo ${string} >> ${expected_file}
+	
 
-		grep -vwE "(timestamp)" ${new_file} > ${file_wo_ts}
-
-		cp ${prev_file} ${expected_file}
-		echo ${string} >> ${expected_file}
-	fi
 
 	diff ${expected_file} ${file_wo_ts} > /dev/null
 	if [ $? -ne 0 ]; then
@@ -81,7 +73,7 @@ function test_send_socket_string
 		echo "With differences"
 		diff -u ${expected_file} ${new_file}
 		echo "Test complete with failure. Make sure you run this script before sending any data to server"
-		return 1
+		exit 1
 
 	else
 		cp ${expected_file} ${prev_file}
@@ -115,15 +107,24 @@ function test_socket_timer
 	sleep ${delay_secs}
 
 	echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
+
+
+
 	verify_timestamps=$(grep -c "timestamp:" ${new_file})
 	echo "No of timestamps found in file: ${verify_timestamps}"
+		
+	
 
 	if [ ${verify_timestamps} -ge ${expected_timestamps} ]; then
 		rm ${new_file}
+		
 	else
 		echo "Differences found in the number of timestamps occurances"
 		echo "Test complete with failure. Check your timer functionality"
-		exit 1	
+
+		exit 1
+		
+		
 	fi
 }
 
@@ -133,26 +134,35 @@ string3="Never stop fighting until you arrive at your destined place - that is, 
 
 function test_socket_thread1
 {
+	
+	
 	for i in {1..20}
 	do
 		echo ${string1} | nc ${target} ${port} -w 1 > /dev/null
 	done
+
 }
 
+
+
 function test_socket_thread2
-{	
+{
+		
 	for i in {1..20}
 	do
 		echo ${string2} | nc ${target} ${port} -w 1 > /dev/null
 	done
+
 }
 
 function test_socket_thread3
 {
+		
 	for i in {1..20}
 	do
 		echo ${string3} | nc ${target} ${port} -w 1  > /dev/null
 	done
+
 }
 
 # Tests to ensure socket multithreaded send/receive is working properly on an aesdsocket utility
@@ -164,12 +174,15 @@ function validate_multithreaded
 	echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
 
 	count_thread1=$(grep -o "$string1" ${new_file} | wc -l)
+
 	count_thread2=$(grep -o "$string2" ${new_file} | wc -l)
+
 	count_thread3=$(grep -o "$string3" ${new_file} | wc -l)
+
 
 	if [ ${count_thread1} -eq 20 ] && [ ${count_thread2} -eq 20 ] && [ ${count_thread3} -eq 20 ]; then
 		echo "**** END OF TEST CASES ****"
-	
+		
 	else
 		if [ ${count_thread1} -ne 20 ]; then
 			echo "Found $count_thread1 instance of string -> $string1 "
@@ -187,8 +200,15 @@ function validate_multithreaded
 		fi
 
 		echo "Test complete with failure. Check your locking mechanism"
-		exit 1		
+
+		exit 1
+		
+		
 	fi
+
+
+
+
 
 }
 
@@ -208,7 +228,6 @@ test_send_socket_string "Harry Potter" ${comparefile}
 test_send_socket_string "You may find the worst enemy or best friend in yourself." ${comparefile}
 test_send_socket_string "The beauty of Taj Mahal is mind blowing" ${comparefile}
 test_send_socket_string "Canberra is awesome" ${comparefile}
-test_send_socket_string "send_file" ${comparefile}
 
 sleep 2s
 
@@ -221,6 +240,7 @@ rm ${comparefile}
 echo ""
 echo "Testing the timer functionality"
 
+
 test_socket_timer 20
 test_socket_timer 40
 test_socket_timer 80
@@ -229,12 +249,17 @@ echo ""
 echo "Testing the multithreaded functionality"
 
 test_socket_thread1&
+
 test_socket_thread2&
+
 test_socket_thread3&
+
 
 sleep 30s
 
 validate_multithreaded
 
+
+
+
 echo "Congrats! Tests completed with success"
-exit 0

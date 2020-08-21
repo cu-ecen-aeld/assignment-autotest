@@ -92,6 +92,9 @@ fi
 cp ${script_dir}/runqemu.sh .
 cp ${script_dir}/build.sh .
 
+# Setup keys
+before_script
+
 # Deploying build and executing test cases if successful
 echo "Running build.sh"
 ./build.sh
