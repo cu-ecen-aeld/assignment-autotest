@@ -23,15 +23,6 @@ else
 	echo "${CONFLINE} already exists in the local.conf file"
 fi
 
-# Customizations for autograder to use shared download, state, and tmpdir
-mkdir -p /var/aesd/yocto-shared/downloads
-
-DL_DIR_LINE="DL_DIR = \"/var/aesd/yocto-shared/downloads\""
-cat conf/local.conf | grep "${DL_DIR_LINE}" > /dev/null
-if [ $? -ne 0 ]; then
-	echo ${DL_DIR_LINE} >> conf/local.conf
-fi
-
 bitbake-layers show-layers | grep "meta-aesd" > /dev/null
 layer_info=$?
 
