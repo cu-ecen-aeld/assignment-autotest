@@ -476,13 +476,24 @@ validate_assignment6_qemu() {
     popd
 }
 
+valgrind_marker=`tmpfile`
+valgrind_assignment6() {
+    valgrind --error-exitcode=1 --leak-check=full --show-leak-kinds=all --track-origins=yes --errors-for-leak-kinds=definite --verbose --log-file=valgrind-out.txt ./aesdsocket
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        add_validate_error "Valgrind failed with $rc"
+        echo "Valgrind output log:"
+        cat valgrind-out.txt
+    fi
+    rm $valgrind_marker 
+}
 # Validate the assignment 5 implementation against native code
 # This means compiling natively, then starting aesdsocket as daemon, then
 # running sockettest.sh against the running instance
 # Arguments: 1) The script directory containing the sockettest executable
 #            2) The source directory containing the aesdsocket application source code and makefile
 validate_assignment6_native() {
-	script_dir=${1}
+    script_dir=${1}
     source_dir=${2}
     pushd ${source_dir}
     make clean && make
@@ -504,4 +515,20 @@ validate_assignment6_native() {
     pkill aesdsocket
     popd
     popd
+
+    echo "Re-running sockettest.sh with valgrind"
+    pushd ${source_dir}
+    valgrind_assignment6&
+    pushd ${script_dir}
+    sleep 1
+    ./sockettest.sh
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        add_validate_error "sockettest.sh returned $rc attempting to run against native compiled aesdsocket instance"
+    fi
+    pkill aesdsocket
+    while [ -f $valgrind_marker ]; do
+      echo "Waiting for aesdsocket and valgrind to exit"  
+      sleep 1 
+    done 
 }
