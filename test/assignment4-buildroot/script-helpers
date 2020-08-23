@@ -232,7 +232,7 @@ validate_makefile_and_memoryleak() {
 
 	if [ $valgrind_test -eq 0 ]; then
 		PATH_EXEC=$(find ${MAKEFILE_PATH} -name "aesdsocket")
-		valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./${PATH_EXEC}&
+		valgrind --error-exitcode=1 --leak-check=full --show-leak-kinds=all --track-origins=yes --errors-for-leak-kinds=definite --verbose --log-file=valgrind-out.txt ./${PATH_EXEC}&
 		sleep 10s
 		
 		# Running sockettest script here to take care of all memory leaks possible
