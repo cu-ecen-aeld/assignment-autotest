@@ -23,6 +23,12 @@ else
 	echo "${CONFLINE} already exists in the local.conf file"
 fi
 
+DL_DIR_LINE="DL_DIR = \"$HOME/.dl\""
+cat conf/local.conf | grep "${DL_DIR_LINE}" > /dev/null
+if [ $? -ne 0 ]; then
+	echo ${DL_DIR_LINE} >> conf/local.conf
+fi
+
 bitbake-layers show-layers | grep "meta-aesd" > /dev/null
 layer_info=$?
 
