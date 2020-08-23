@@ -476,16 +476,20 @@ validate_assignment6_qemu() {
     popd
 }
 
-valgrind_marker=`tmpfile`
+# First argument: The marker file to remove when exiting
 valgrind_assignment6() {
+    valgrind_marker=$1
+    echo "Starting valgrind"
     valgrind --error-exitcode=1 --leak-check=full --show-leak-kinds=all --track-origins=yes --errors-for-leak-kinds=definite --verbose --log-file=valgrind-out.txt ./aesdsocket
     rc=$?
+    echo "Valgrind and aesdsocket complete"
     if [ $rc -ne 0 ]; then
         add_validate_error "Valgrind failed with $rc"
-        echo "Valgrind output log:"
+        echo "Valgrind output error log:"
         cat valgrind-out.txt
     fi
-    rm $valgrind_marker 
+    echo deleting marker file $valgrind_marker
+    rm $valgrind_marker
 }
 # Validate the assignment 5 implementation against native code
 # This means compiling natively, then starting aesdsocket as daemon, then
@@ -512,23 +516,40 @@ validate_assignment6_native() {
     if [ $rc -ne 0 ]; then
         add_validate_error "sockettest.sh returned $rc attempting to run against native compiled aesdsocket instance"
     fi
-    pkill aesdsocket
+    PID=$(pgrep aesdsocket)
+    kill $PID
     popd
     popd
 
+    echo "Waiting for aesdsocket application with pid $PID to terminate"
+    while $(kill -0 $PID 2>/dev/null); do
+        sleep 1
+    done
+    
     echo "Re-running sockettest.sh with valgrind"
     pushd ${source_dir}
-    valgrind_assignment6&
+    valgrind_marker=$(mktemp)
+    valgrind_assignment6 $valgrind_marker &
     pushd ${script_dir}
-    sleep 1
+    while [ 1 ]; do
+       # Write timestamp: while waiting for start since these get filtered out during the diff check	
+       echo "timestamp:wait-for-startup" | nc localhost 9000 -w 1 | grep "timestamp:wait-for-startup"
+       if [ $? -eq 0 ]; then
+           break;
+       fi
+       echo "Waiting for aesdsocket application to start"
+       sleep 1
+    done
     ./sockettest.sh
     rc=$?
     if [ $rc -ne 0 ]; then
-        add_validate_error "sockettest.sh returned $rc attempting to run against native compiled aesdsocket instance"
+        add_validate_error "sockettest.sh returned $rc attempting to run against native compiled aesdsocket instance running under valgrind"
     fi
-    pkill aesdsocket
+    PID=$(pgrep -f "valgrind.*aesdsocket")
+    echo "Stopping valgrind and aesdsocket process at pid $PID"
+    kill $PID
     while [ -f $valgrind_marker ]; do
-      echo "Waiting for aesdsocket and valgrind to exit"  
-      sleep 1 
+        echo "Waiting for aesdsocket and valgrind to exit"  
+        sleep 1 
     done 
 }
