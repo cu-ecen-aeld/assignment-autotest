@@ -184,4 +184,4 @@ sleep 60s
 # Validating if Wall and Werror flags are present in Makefile
 validate_makefile_flags
 # Validating if makefile can create an executable successfully and valgrind test can be implemented.
-validate_makefile_and_memoryleak ${script_dir}
+# validate_makefile_and_memoryleak ${script_dir}
