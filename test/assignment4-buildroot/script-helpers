@@ -67,29 +67,36 @@ validate_assignment2_checks() {
 	fi
 }
 
-# Not required for yocto
+# This function is used for validating buildroot defconfig file in base_external/configs/aesd_qemu_defconfig file.
 validate_buildroot_config() {
-	grep -q 'BR2_PACKAGE_DROPBEAR=y' "base_external/configs/aesd_qemu_defconfig"
+	DEFCONFIG_BASE_EXTERNAL=base_external/configs/aesd_qemu_defconfig
+
+	grep -q 'BR2_PACKAGE_DROPBEAR=y' "${DEFCONFIG_BASE_EXTERNAL}"
 	rc=$?
 	if [ $rc -ne 0 ]; then
-		echo 'BR2_PACKAGE_DROPBEAR=y' >> "base_external/configs/aesd_qemu_defconfig"
-		add_validate_error "Dropbear support missing in config, added manually."
+		add_validate_error "Dropbear support missing in aesd_qemu_defconfig"
+		echo "Adding Dropbear Support manually"
+		echo 'BR2_PACKAGE_DROPBEAR=y' >> "${DEFCONFIG_BASE_EXTERNAL}"
 	fi
 	
-	grep -q 'BR2_PACKAGE_AESD_ASSIGNMENTS=y' "base_external/configs/aesd_qemu_defconfig"
+	grep -q 'BR2_PACKAGE_AESD_ASSIGNMENTS=y' "${DEFCONFIG_BASE_EXTERNAL}"
 	rc=$?
 	if [ $rc -ne 0 ]; then
-		echo 'BR2_PACKAGE_AESD_ASSIGNMENTS=y' >> "base_external/configs/aesd_qemu_defconfig"
-		add_validate_error "AESD_ASSIGNMENTS package disabled, Enabled manually."
+		add_validate_error "AESD_ASSIGNMENTS package disabled in aesd_qemu_defconfig"
+		echo "Adding AESD_ASSIGNMENTS package manually"
+		echo 'BR2_PACKAGE_AESD_ASSIGNMENTS=y' >> "${DEFCONFIG_BASE_EXTERNAL}"
 	fi
 	
-	grep -q 'BR2_TARGET_GENERIC_ROOT_PASSWD="root"' "base_external/configs/aesd_qemu_defconfig"
-	rc=$?
+	grep -q 'BR2_TARGET_GENERIC_ROOT_PASSWD="root"' "${DEFCONFIG_BASE_EXTERNAL}"
+	rc=$?	
 	if [ $rc -ne 0 ]; then
-		echo 'BR2_TARGET_GENERIC_ROOT_PASSWD="root"' >> "base_external/configs/aesd_qemu_defconfig"
-		add_validate_error "Root password added manually."
+		add_validate_error "Root password not added in aesd_qemu_defconfig"
+		echo "Setting password to root manually"
+		echo 'BR2_TARGET_GENERIC_ROOT_PASSWD="root"' >> "${DEFCONFIG_BASE_EXTERNAL}"	
 	fi
 }
+
+
 
 # This function runs sockettest.sh in order to validate aesdsocket functionality.
 # @param1: Path to sockettest.sh script
@@ -279,31 +286,31 @@ validate_makefile_and_memoryleak() {
 validate_makefile_flags() {
 	echo "validating makefile Flags"
 
-	commit_id=$(grep "SRCREV" meta-aesd/recipes-aesd-assignments/aesd-assignments/aesd-assignments_git.bb | cut -d'"' -f2)
-	short_commit_id=$(echo ${commit_id} | head -c 10)
-	MAKEFILE_PATH=build/tmp/work/aarch64-poky-linux/aesd-assignments/1.0+gitAUTOINC+${short_commit_id}-r0/git
+	commit_id=$(grep "AESD_ASSIGNMENTS_VERSION" base_external/package/aesd-assignments/aesd-assignments.mk | cut -d "=" -f2 | tr -d ' ')
+	MAKEFILE_PATH=buildroot/output/build/aesd-assignments-${commit_id}
 
 
-	grep -i "wall" ${MAKEFILE_PATH}/makefile
+	grep -is "wall" ${MAKEFILE_PATH}/makefile
 	rc=$?
 	if [ $rc -ne 0 ]; then
-		grep -i "wall" ${MAKEFILE_PATH}/Makefile
+		grep -is "wall" ${MAKEFILE_PATH}/Makefile
 		rc=$?
 		if [ $rc -ne 0 ]; then
 			add_validate_error "wall flag missing in Makefile"
 		fi
 	fi
 
-	grep -i "Werror" ${MAKEFILE_PATH}/makefile
+	grep -is "Werror" ${MAKEFILE_PATH}/makefile
 	rc=$?
 	if [ $rc -ne 0 ]; then
-		grep -i "Werror" ${MAKEFILE_PATH}/Makefile
+		grep -is "Werror" ${MAKEFILE_PATH}/Makefile
 		rc=$?
 		if [ $rc -ne 0 ]; then
 			add_validate_error "Werror flag missing"
 		fi
 	fi
 }
+
 
 
 # This function copies the required file to the directory ~/assignment4_build_binaries/<basename ${1}>
@@ -452,27 +459,9 @@ before_script() {
 	#- git config --global user.name "User name"
 }
 
-# No longer required. Taken care inside assignment-5-test.sh
-validate_bb_install() {
-	ROOTFS_PATH=build/tmp/work/qemuarm64-poky-linux/core-image-aesd/1.0-r0/rootfs
-
-	if [ ! -e ${ROOTFS_PATH}/etc/init.d/aesdsocket-start-stop ]; then
-		add_validate_error "aesdsocket-start-stop script not found in /etc/init.d"
-	else
-		# Check for bash_sh here
-		validate_bash_sh /etc/init.d/S99aesdsocket
-	fi
-
-	if [ ! -e ${ROOTFS_PATH}/usr/bin/aesdsocket ]; then
-		add_validate_error "aesdsocket executable not found in /usr/bin"
-	else
-		echo "aesdsocket executable already exists"
-	fi
-}
-
 # Validate the assignment 6 implementation against a running qemu instance
 # This means making sure we can run sockettest.sh against qemu after startup
-validate_assignment6_qemu() {
+validate_assignment5_qemu() {
 	script_dir=${1}
     pushd ${script_dir}
     ./sockettest.sh
@@ -481,6 +470,13 @@ validate_assignment6_qemu() {
         add_validate_error "sockettest.sh returned $rc attempting to run against qemu instance"
     fi
     popd
+}
+
+
+# Validate the assignment 6 implementation against a running qemu instance
+# This means making sure we can run sockettest.sh against qemu after startup
+validate_assignment6_qemu() {
+    validate_assignment5_qemu $@
 }
 
 # First argument: The marker file to remove when exiting
@@ -498,7 +494,39 @@ valgrind_assignment6() {
     echo deleting marker file $valgrind_marker
     rm $valgrind_marker
 }
+
 # Validate the assignment 5 implementation against native code
+# This means compiling natively, then starting aesdsocket as daemon, then
+# running sockettest.sh against the running instance
+# Arguments: 1) The script directory containing the sockettest executable
+#            2) The source directory containing the aesdsocket application source code and makefile
+# TODO: should be possible to replace this with the assignment 6 native validation function instead
+validate_assignment5_native() {
+	script_dir=${1}
+    source_dir=${2}
+    pushd ${source_dir}
+    make clean && make
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        add_validate_error "make returned $rc attempting to build native application"
+    fi
+    ./aesdsocket -d
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        add_validate_error "starting aesdocket failed with $rc"
+    fi
+    pushd ${script_dir}
+    ./sockettest.sh
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        add_validate_error "sockettest.sh returned $rc attempting to run against native compiled aesdsocket instance"
+    fi
+    pkill aesdsocket
+    popd
+    popd
+}
+
+# Validate the assignment 6 implementation against native code
 # This means compiling natively, then starting aesdsocket as daemon, then
 # running sockettest.sh against the running instance
 # Arguments: 1) The script directory containing the sockettest executable
