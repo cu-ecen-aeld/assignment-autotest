@@ -29,7 +29,7 @@ function parse_docker_options {
         # Use a uid/gid to match the specified user account, and run as this user inside the container
         # This prevents issue with permissions when running inside vs outside a container
         groupadd -g ${gid} aesd
-        echo "Adding user aesd with uid ${uid} gid ${gid}"
+        echo "Adding user aesd with uid ${uid} gid ${gid} to match runtime environment"
         userargs="--uid ${uid} --gid ${gid}"
     fi
     # Create an aesd user to run all tests as.  Yocto doesn't allow you to run builds as
@@ -39,7 +39,10 @@ function parse_docker_options {
     adduser ${userargs} --disabled-password --gecos '' aesd 
     adduser aesd sudo
     echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-    ln -s /var/aesd/.dl /home/aesd/.dl
+    if [ ! -z ${uid} ]; then
+        # Re-use the home directory dl content for the current user
+        ln -s /var/aesd/.dl /home/aesd/.dl
+    fi
     # This runs the rest of the script as the "aesd" user and exits with rc specified
     sudo -E -s -u aesd HOME=/home/aesd $0
     exit $?
