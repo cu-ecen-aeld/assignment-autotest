@@ -24,19 +24,26 @@ ssh_cmd() {
 
 # This function waits for the qemu to boot up.
 wait_for_qemu(){
-	echo "Waiting 30s for qemu to startup"
-	sleep 30s
-}
+	echo "Waiting for qemu to startup"
+	local wait_for_ssh_startup="true"
+	while [ $wait_for_ssh_startup == "true" ]; do
+		ssh_cmd "exit" > /dev/null 2>&1
+		if [ $? -eq 0 ]; then
+			echo "SSH login successful, waiting 20 additional seconds for process startup"
+			sleep 20
+			wait_for_ssh_startup="false"
+		else
+			sleep 1
+		fi
+	done
+} 
 
 
 # This function runs runqemu.sh in background and waits for qemu to boot up.
 validate_qemu(){
 	echo "Executing runqemu.sh in background"
 	
-	# See https://stackoverflow.com/a/32569573 
-	# Removing unnecessary prints due to runqemu.sh and displays prints as soon as it encounters "Starting network: IPv6: ADDRCONF(NETDEV"
-	./runqemu.sh | sed -e '1,/Starting network: IPv6: ADDRCONF(NETDEV/ d' &
-#	./runqemu.sh &
+	./runqemu.sh &
 	wait_for_qemu
 }
 

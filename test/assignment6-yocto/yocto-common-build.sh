@@ -14,7 +14,7 @@ before_script
 echo "Running build.sh"
 ./build.sh
 rc=$?
-if [ $rc -eq 0 ]; then
+if [ $rc -ne 0 ]; then
 	add_validate_error "Build step failed with rc $?"
 fi
 
