@@ -1,0 +1,1 @@
+../assignment6/long_string.txt

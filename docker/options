@@ -3,10 +3,13 @@
 
 # Parse the list of docker options passed
 # (Use "$@" as passed parameter)
+# Options -i and -g are used to specify UID and GID of user to run this
+# container under.
+# Option -n specfies creating a new user for running the container
 function parse_docker_options {
     uid=
     gid=
-    while getopts ":i:g:" opt; do
+    while getopts ":i:g:n" opt; do
         case ${opt} in
             i )
                 uid=$OPTARG
@@ -14,7 +17,9 @@ function parse_docker_options {
             g )
                 gid=$OPTARG
                 ;;
- 
+            n )
+                newuser="true"
+                ;;
             \? )
                 echo "Invalid option: $OPTARG" 1>&2
                 ;;
@@ -24,15 +29,27 @@ function parse_docker_options {
         esac
     done
     shift $((OPTIND -1))
+    userargs=
     if [ ! -z ${uid} ]; then
-        # If a uid argument was specified, add a user to the container with this uid/gid and
-        # then restart the script with this uid/gid
-        echo "Adding user aesd with uid ${uid} gid ${gid}"
+        # Use a uid/gid to match the specified user account, and run as this user inside the container
+        # This prevents issue with permissions when running inside vs outside a container
         groupadd -g ${gid} aesd
-        adduser --uid ${uid} --gid ${gid} --disabled-password --gecos '' aesd 
+        echo "Adding user aesd with uid ${uid} gid ${gid} to match runtime environment"
+        userargs="--uid ${uid} --gid ${gid}"
+        newuser="true"
+    fi
+    if [ "${newuser}" == "true" ]; then
+        # Create an aesd user to run all tests as.  Yocto doesn't allow you to run builds as
+        # the root user account and if we are running as non-root we want a user account with specified
+        # matching uid/gid
+        # then restart the script with this user account
+        adduser ${userargs} --disabled-password --gecos '' aesd 
         adduser aesd sudo
         echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-        ln -s /var/aesd/.dl /home/aesd/.dl
+        if [ ! -z ${uid} ]; then
+            # Re-use the home directory dl content for the current user
+            ln -s /var/aesd/.dl /home/aesd/.dl
+        fi
         # This runs the rest of the script as the "aesd" user and exits with rc specified
         sudo -E -s -u aesd HOME=/home/aesd $0
         exit $?
