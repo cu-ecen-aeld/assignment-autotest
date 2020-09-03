@@ -20,7 +20,7 @@ echo "#!/bin/sh">> arm-unknown-linux-gnueabi-gcc
 echo "touch validation.txt" >> arm-unknown-linux-gnueabi-gcc
 
 #set the compiler path to arm-unknown-linux-gnueabi-gcc created
-export PATH=$PATH:$(pwd)
+export PATH=$(pwd):$PATH 
 
 make clean
 make CROSS_COMPILE=arm-unknown-linux-gnueabi-
