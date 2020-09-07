@@ -28,7 +28,7 @@ if [[ -z ${DO_VALIDATE} || ${DO_VALIDATE} -eq 1 ]]; then
 	validate_qemu
 
 	# Validating test cases inside qemu
-	validate_assignment5_qemu "${script_dir}"
+	validate_assignment7_qemu "${script_dir}"
 
 	echo "Killing qemu"
 	killall qemu-system-aarch64
