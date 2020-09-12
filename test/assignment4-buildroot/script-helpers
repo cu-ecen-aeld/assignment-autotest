@@ -589,6 +589,7 @@ validate_assignment6_native() {
     done 
 }
 
+validate_assignment7_qemu() {
 	wait_for_qemu
 	
 	cat result.txt | grep "hello"
