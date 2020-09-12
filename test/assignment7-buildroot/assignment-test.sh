@@ -7,16 +7,17 @@ source script-helpers
 
 script_dir="$(pwd -P )"
 testdir=$1
-qemu_executable_path=/usr/bin	#Path where writer,finder,tester.sh are stored
 
 # Invoke docker script with --env SKIP_BUILD=1 --env DO_VALIDATE=1 to perform a validation only
 # test
 echo "starting test with SKIP_BUILD ${SKIP_BUILD} and DO_VALIDATE ${DO_VALIDATE}"
 if [[ -z ${SKIP_BUILD} || ${SKIP_BUILD} -eq 0 ]]; then
-    . ./assignment-7-build.sh ${testdir}
+	pushd ${testdir}
+    . ./buildroot-common-build.sh
     rc=$?
     echo "build step complete with status $?"
     echo "Validation errors ${validate_error}"
+	popd
 fi
 
 

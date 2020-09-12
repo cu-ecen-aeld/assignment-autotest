@@ -588,3 +588,28 @@ validate_assignment6_native() {
         sleep 1 
     done 
 }
+
+	wait_for_qemu
+	
+	cat result.txt | grep "hello"
+	if [ $? -ne 0 ]; then
+		add_validate_error "hello module not loaded on boot !!!"
+	fi
+	
+	cat result.txt | grep "faulty"
+	if [ $? -ne 0 ]; then
+		add_validate_error "faulty module not loaded on boot !!!"
+	fi
+	
+	cat result.txt | grep "scull"
+	if [ $? -ne 0 ]; then
+		add_validate_error "scull module not loaded on boot !!!"
+	fi
+	
+	cat result.txt | grep "${githubstudent}"
+	if [ $? -ne 0 ]; then
+		add_validate_error "Github Username not found in hello module !!!"
+	fi
+	
+	rm -f result.txt
+}
