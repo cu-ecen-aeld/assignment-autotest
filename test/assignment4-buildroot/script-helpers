@@ -44,12 +44,9 @@ wait_for_qemu() {
 	do
 		sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 lsmod >> result.txt
 		if [ $? -eq 0 ]; then
-			sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 rmmod hello
+			sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 modprobe hello
 			if [ $? -eq 0 ]; then
-				sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 modprobe hello
-				if [ $? -eq 0 ]; then
-					sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 dmesg | tail -n 3 >> result.txt
-				fi
+				sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 dmesg | tail -n 3 >> result.txt
 			fi
 			break;
 		fi
