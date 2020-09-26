@@ -23,20 +23,40 @@ ssh_cmd() {
 
 
 # This function waits for the qemu to boot up.
-wait_for_qemu(){
-	echo "Waiting for qemu to startup"
-	local wait_for_ssh_startup="true"
-	while [ $wait_for_ssh_startup == "true" ]; do
-		ssh_cmd "exit" > /dev/null 2>&1
+# wait_for_qemu(){
+# 	echo "Waiting for qemu to startup"
+# 	local wait_for_ssh_startup="true"
+# 	while [ $wait_for_ssh_startup == "true" ]; do
+# 		ssh_cmd "exit" > /dev/null 2>&1
+# 		if [ $? -eq 0 ]; then
+# 			echo "SSH login successful, waiting 20 additional seconds for process startup"
+# 			sleep 20
+# 			wait_for_ssh_startup="false"
+# 		else
+# 			sleep 1
+# 		fi
+# 	done
+# } 
+
+wait_for_qemu() {
+	ssh-keygen -f "/root/.ssh/known_hosts" -R "[localhost]:10022"
+	for i in $( seq 1 20)
+	do
+		sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 lsmod >> result.txt
 		if [ $? -eq 0 ]; then
-			echo "SSH login successful, waiting 20 additional seconds for process startup"
-			sleep 20
-			wait_for_ssh_startup="false"
-		else
-			sleep 1
+			sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 modprobe hello
+			if [ $? -eq 0 ]; then
+				sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 dmesg | tail -n 3 >> result.txt
+			fi
+			break;
 		fi
+		
+		if [ $i -eq 20 ]; then
+			add_validate_error "Failed to SSH in QEMU !!!"
+		fi
+		sleep 5s
 	done
-} 
+}
 
 
 # This function runs runqemu.sh in background and waits for qemu to boot up.
@@ -587,4 +607,30 @@ validate_assignment6_native() {
         echo "Waiting for aesdsocket and valgrind to exit"  
         sleep 1 
     done 
+}
+
+validate_assignment7_qemu() {
+	wait_for_qemu
+	
+	cat result.txt | grep "hello"
+	if [ $? -ne 0 ]; then
+		add_validate_error "hello module not loaded on boot !!!"
+	fi
+	
+	cat result.txt | grep "faulty"
+	if [ $? -ne 0 ]; then
+		add_validate_error "faulty module not loaded on boot !!!"
+	fi
+	
+	cat result.txt | grep "scull"
+	if [ $? -ne 0 ]; then
+		add_validate_error "scull module not loaded on boot !!!"
+	fi
+	
+	cat result.txt | grep "${githubstudent}"
+	if [ $? -ne 0 ]; then
+		add_validate_error "Github Username not found in hello module !!!"
+	fi
+	
+	rm -f result.txt
 }
