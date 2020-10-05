@@ -7,7 +7,6 @@ source script-helpers
 
 script_dir="$(pwd -P )"
 testdir=$1
-rootfs_path=/usr/bin/
 
 # Invoke docker script with --env SKIP_BUILD=1 --env DO_VALIDATE=1 to perform a validation only
 # test
