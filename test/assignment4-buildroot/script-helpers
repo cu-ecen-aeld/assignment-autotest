@@ -15,47 +15,39 @@ add_validate_error() {
 
 
 # This function is used to ssh into qemu in order to execute a command fed as parameter
-# @parameter1: command to be executed inside qemu
+# @parameter1: command to be executed inside qemu.
+#       If you need to send more than one parameter, enclose in quotes
 ssh_cmd() {
 	cmd=$1 
 	sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 ${cmd}
 }
 
 
-# This function waits for the qemu to boot up.
-# wait_for_qemu(){
-# 	echo "Waiting for qemu to startup"
-# 	local wait_for_ssh_startup="true"
-# 	while [ $wait_for_ssh_startup == "true" ]; do
-# 		ssh_cmd "exit" > /dev/null 2>&1
-# 		if [ $? -eq 0 ]; then
-# 			echo "SSH login successful, waiting 20 additional seconds for process startup"
-# 			sleep 20
-# 			wait_for_ssh_startup="false"
-# 		else
-# 			sleep 1
-# 		fi
-# 	done
-# } 
+#This function waits for the qemu to boot up.
+wait_for_qemu(){
+ 	echo "Waiting for qemu to startup"
+ 	local wait_for_ssh_startup="true"
+ 	while [ $wait_for_ssh_startup == "true" ]; do
+ 		ssh_cmd "exit" > /dev/null 2>&1
+ 		if [ $? -eq 0 ]; then
+ 			echo "SSH login successful, waiting 20 additional seconds for process startup"
+ 			sleep 20
+ 			wait_for_ssh_startup="false"
+ 		else
+ 			sleep 1
+ 		fi
+ 	done
+} 
 
-wait_for_qemu() {
-	ssh-keygen -f "/root/.ssh/known_hosts" -R "[localhost]:10022"
-	for i in $( seq 1 20)
-	do
-		sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 lsmod >> result.txt
-		if [ $? -eq 0 ]; then
-			sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 modprobe hello
-			if [ $? -eq 0 ]; then
-				sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 dmesg | tail -n 3 >> result.txt
-			fi
-			break;
-		fi
-		
-		if [ $i -eq 20 ]; then
-			add_validate_error "Failed to SSH in QEMU !!!"
-		fi
-		sleep 5s
-	done
+validate_driver_assignment7() {
+    ssh_cmd lsmod >> result.txt
+    if [ $? -eq 0 ]; then
+        ssh_cmd "modprobe hello" >> result.txt
+        if [ $? -eq 0 ]; then
+            ssh_cmd "dmesg | tail -n 3" >> result.txt
+        fi
+        break;
+    fi
 }
 
 
@@ -610,7 +602,7 @@ validate_assignment6_native() {
 }
 
 validate_assignment7_qemu() {
-	wait_for_qemu
+    validate_driver_assignment7
 	
 	cat result.txt | grep "hello"
 	if [ $? -ne 0 ]; then
@@ -636,22 +628,24 @@ validate_assignment7_qemu() {
 }
 
 validate_aesdchar() {
-		sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 lsmod | grep "aesdchar"
+        echo "Adding and removing aesdchar driver"
+		ssh_cmd "lsmod | grep \"aesdchar\""
 		if [ $? -eq 0 ]; then
-					sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 rmmod aesdchar
+		    ssh_cmd "rmmod aesdchar"
+        else
+		    add_validate_error "aesdchar driver not loaded at startup"	
 		fi
-		
-		sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 modprobe aesdchar
+		ssh_cmd "modprobe aesdchar"
 
 }
-validate_driver() {
+validate_driver_assignment8() {
 
        	echo "Validation of driver"
 
 		validate_aesdchar
-       	sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 test -f ../usr/bin/drivertest.sh
+       	ssh_cmd "test -f /usr/bin/drivertest.sh"
         if [ $? -eq 0 ]; then
-                sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 ../usr/bin/drivertest.sh
+                ssh_cmd "/usr/bin/drivertest.sh"
                 if [ $? -ne 0 ]; then
                         add_validate_error "Driver test failed"
                 fi
@@ -659,27 +653,27 @@ validate_driver() {
         else
                 add_validate_error "drivertest - not present in /usr/bin"
         fi
-
 }
 
-validate_application() {
-
+validate_application_assignment8() {
+        script_dir=$1
        	echo "Validation of aesdsocket"
 
 		validate_aesdchar
 
-       	sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 ps aux | grep -v grep| grep /usr/bin/aesdsocket
+       	ssh_cmd "ps ax | grep -v grep| grep /usr/bin/aesdsocket"
         if [ $? -ne 0 ]; then
                 add_validate_error "Socket application is not running on boot"
-
-                sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 test -f ../usr/bin/aesdsocket
+                ssh_cmd "test -f /usr/bin/aesdsocket"
+                if [ $? -ne 0 ]; then
+                    add_validate_error "aesdsocket missing from the filesystem"
+                fi
         fi
 
         ${script_dir}/sockettest.sh
         if [ $? -ne 0 ]; then
                 add_validate_error "sockettest.sh failed"
         fi
-
 }
 
 add_to_rootfs() {
