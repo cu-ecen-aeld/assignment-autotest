@@ -29,6 +29,8 @@ ssh_cmd() {
 add_to_rootfs() {
 	path_to_file=$1
 	rootfs_location=$2
+	echo "XHECKIGGGGGGGGGGGGGGGGGGGGGG"
+	echo ${rootfs_location}
 	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P  10022 ${path_to_file} root@localhost:${rootfs_location}
 }
 
@@ -42,8 +44,8 @@ wait_for_qemu(){
 		ssh_cmd "exit" > ${tmpfile} 2>&1
 		rc = $?
 		if [ $rc -eq 0 ]; then
-			echo "SSH login successful, waiting 20 additional seconds for process startup"
-			sleep 20
+			echo "SSH login successful, waiting 40 additional seconds for process startup"
+			sleep 40
 			wait_for_ssh_startup="false"
 		else
 			sleep 5
@@ -615,6 +617,8 @@ validate_assignment6_native() {
 }
 
 validate_assignment7_qemu() {
+	echo "Validating assignment 7 in QEMU"
+
     validate_driver_assignment7
 	
 	cat result.txt | grep "hello"
@@ -674,7 +678,7 @@ validate_application_assignment8() {
 
 		validate_aesdchar
 
-       	ssh_cmd "ps ax | grep -v grep| grep /usr/bin/aesdsocket"
+       	ssh_cmd "ps | grep -v grep| grep /usr/bin/aesdsocket"
         if [ $? -ne 0 ]; then
                 add_validate_error "Socket application is not running on boot"
                 ssh_cmd "test -f /usr/bin/aesdsocket"
