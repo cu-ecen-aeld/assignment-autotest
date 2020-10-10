@@ -22,6 +22,15 @@ ssh_cmd() {
 	sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 ${cmd}
 }
 
+# Add the local file at
+#   param1
+# to the rootfs of the target at location
+#   param2
+add_to_rootfs() {
+	path_to_file=$1
+	rootfs_location=$2
+	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P  10022 ${path_to_file} root@localhost:${rootfs_location}
+}
 
 #This function waits for the qemu to boot up.
 wait_for_qemu(){
@@ -680,10 +689,4 @@ validate_application_assignment8() {
         fi
 }
 
-add_to_rootfs() {
-	path_to_file=$1
-	rootfs_location=$2
 
-	scp -P 10022 ${path_to_file} root@localhost:${rootfs_location}
-
-}

@@ -76,7 +76,7 @@ test_send_socket_string "abcdefg" ${comparefile}
 test_send_socket_string "hijklmnop" ${comparefile}
 test_send_socket_string "1234567890" ${comparefile}
 test_send_socket_string "9876543210" ${comparefile}
-if [ -f long_string.txt ]; then
+if [ -e long_string.txt ]; then
     echo "Sending long string from long_string.txt file"
     sendstring=`cat long_string.txt`
     test_send_socket_string ${sendstring} ${comparefile}
