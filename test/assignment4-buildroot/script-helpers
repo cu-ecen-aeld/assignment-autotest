@@ -40,7 +40,7 @@ wait_for_qemu(){
 	while [ $wait_for_ssh_startup == "true" ]; do
 	tmpfile=`mktemp`
 		ssh_cmd "exit" > ${tmpfile} 2>&1
-		rc = $?
+		rc=$?
 		if [ $rc -eq 0 ]; then
 			echo "SSH login successful, waiting 40 additional seconds for process startup"
 			sleep 40
