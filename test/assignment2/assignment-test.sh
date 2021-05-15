@@ -17,7 +17,7 @@ chmod 777 arm-unknown-linux-gnueabi-gcc
 #Writing contents to arm-unknown-linux-gnueabi-gcc
 #A file named validation.txt will be created if arm-unknown-linux-gnueabi-gcc is invoked
 echo "#!/bin/sh">> arm-unknown-linux-gnueabi-gcc
-echo "touch validation.txt" >> arm-unknown-linux-gnueabi-gcc
+echo "touch $(pwd)/validation.txt" >> arm-unknown-linux-gnueabi-gcc
 
 #set the compiler path to arm-unknown-linux-gnueabi-gcc created
 export PATH=$(pwd):$PATH 
