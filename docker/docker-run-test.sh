@@ -33,9 +33,6 @@ if [ $uid -ne 0 ]; then
     # This allows us to share build content and support incremental builds inside or
     # outside a docker container
     docker_userargs="-i $(id -u ${USER}) -g $(id -g ${USER})"
-else
-    # If we are running as root, use -n to create a new account to run under inside the container
-    docker_userargs="-n"
 fi
 set -x
-docker run ${docker_volumes} ${docker_environment} -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ./test.sh  ${docker_userargs}
+docker run ${docker_volumes} ${docker_environment} -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ${docker_userargs} ${basedir_abs}/test.sh

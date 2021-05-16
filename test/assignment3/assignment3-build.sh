@@ -28,7 +28,7 @@ makefile_check
 #Running manual_linux.sh with already existing correct directory path as parameter
 mkdir "${OUTDIR}"
 echo "Running manual_linux.sh with parameter"
-./manual_linux.sh "${OUTDIR}"
+./manual-linux/manual_linux.sh "${OUTDIR}"
 rc=$?
 if [ $rc -ne 0 ]; then
 	add_validate_error "manual_linux.sh should have exited with return value 0 if correct existing directory path was specified as a parameter"
