@@ -21,12 +21,13 @@ if [ ! -e ~/.ssh/id_rsa_aesd_nopassword ] && [ -z "${SSH_PRIVATE_KEY}" ] && [ -z
     else
         echo "Attempting to run test without SSH key"
     fi
+else
+    if [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}" && -e ]; then
+        echo "Setting private key based on keyfile"
+        export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa_aesd_nopassword`
+    fi
 fi
 
-if [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}" ]; then
-    echo "Setting private key based on keyfile"
-    export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa_aesd_nopassword`
-fi
 if [ -z "${assignment}" ]; then
     echo "No assignment specified, using latest docker container"
 else
