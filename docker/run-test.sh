@@ -4,7 +4,7 @@
 # reproduce CI builds on your local machine.
 # You should call this from the base directory of your repository (the one
 # which contains test.sh)
-basedir_abs=$(realpath $(dirname $0))
+basedir_abs=$(realpath .)
 echo "content of ${basedir_abs}:"
 ls ${basedir_abs}
 if [ ! -f ${basedir_abs}/test.sh ]; then
