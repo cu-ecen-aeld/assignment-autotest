@@ -5,6 +5,8 @@
 # You should call this from the base directory of your repository (the one
 # which contains test.sh)
 basedir_abs=`realpath .`
+echo "content of ${basedir_abs}:"
+ls ${basedir_abs}
 if [ ! -f ${basedir_abs}/test.sh ]; then
     echo "Please run this script from a directory containing a test.sh file (typically the root of your repo)"
     exit 1
