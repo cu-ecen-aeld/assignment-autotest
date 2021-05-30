@@ -9,20 +9,24 @@ if [ ! -f ${basedir_abs}/test.sh ]; then
     echo "Please run this script from a directory containing a test.sh file (typically the root of your repo)"
     exit 1
 fi
-
+assignment=$(cat ${basedir_abs}/conf/assignment.txt)
 if [ ! -e ~/.ssh/id_rsa_aesd_nopassword ] && [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}" ]; then
     echo "Please create an ssh key with access to AESD repositories and no password"
     echo "Then place at ~/.ssh/id_rsa_aesd_nopassword"
     echo "Alternatively, you can define environment variable SSH_PRIVATE_KEY or SSH_PRIVATE_KEY_BASE64 with"
     echo "the content of the ssh private key or base64 uuencoded prviate key"
-    exit 1
+    if [ -e ${basedir_abs}/conf/requres-ssh-key ]; then
+        echo "Failing here since assignment ${assignment} requires SSH key"
+        exit 1
+    else
+        echo "Attempting to run test without SSH key"
+    fi
 fi
 
 if [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}" ]; then
     echo "Setting private key based on keyfile"
     export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa_aesd_nopassword`
 fi
-assignment=$(cat ${basedir_abs}/conf/assignment.txt)
 if [ -z "${assignment}" ]; then
     echo "No assignment specified, using latest docker container"
 else
