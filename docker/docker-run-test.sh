@@ -22,7 +22,13 @@ if [ -z "${SSH_PRIVATE_KEY}" ] && [ -z "${SSH_PRIVATE_KEY_BASE64}" ]; then
     echo "Setting private key based on keyfile"
     export SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa_aesd_nopassword`
 fi
-assignment=`cat ${basedir_abs}/conf/assignment.txt`
+assignment=$(cat ${basedir_abs}/conf/assignment.txt)
+if [ -z "${assignment}" ]; then
+    echo "No assignment specified, using latest docker container"
+else
+    echo "Using container for assignment ${assignment}"
+    dockertag=":${assignment}"
+fi
 docker_volumes="-v ${basedir_abs}:${basedir_abs} -v ${HOME}/.dl:/var/aesd/.dl -v /tmp:/tmp"
 docker_environment="--env SSH_PRIVATE_KEY --env SSH_PRIVATE_KEY_BASE64 --env DO_VALIDATE --env SKIP_BUILD"
 uid=$(id -u ${USER})
@@ -35,4 +41,4 @@ if [ $uid -ne 0 ]; then
     docker_userargs="-i $(id -u ${USER}) -g $(id -g ${USER})"
 fi
 set -x
-docker run ${docker_volumes} ${docker_environment} -w="${basedir_abs}" $@ cuaesd/aesd-autotest:${assignment}  ${docker_userargs} ${basedir_abs}/test.sh
+docker run ${docker_volumes} ${docker_environment} -w="${basedir_abs}" $@ cuaesd/aesd-autotest${dockertag}  ${docker_userargs} ${basedir_abs}/test.sh
