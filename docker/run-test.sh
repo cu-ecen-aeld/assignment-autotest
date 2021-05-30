@@ -5,8 +5,6 @@
 # You should call this from the base directory of your repository (the one
 # which contains test.sh)
 basedir_abs=$(realpath .)
-echo "content of ${basedir_abs}:"
-ls ${basedir_abs}
 if [ ! -f ${basedir_abs}/test.sh ]; then
     echo "Please run this script from a directory containing a test.sh file (typically the root of your repo)"
     exit 1
@@ -36,9 +34,9 @@ else
     echo "Using container for assignment ${assignment}"
     dockertag=":${assignment}"
 fi
-docker_volumes="--mount type=bind,src=${basedir_abs},dst=${basedir_abs}"
-docker_volumes+=" --mount type=bind,src=${HOME}/.dl,dst=/home/autotest-admin/.dl"
-docker_volumes+=" --mount type=bind,src=/tmp,dst=/tmp"
+docker_volumes="-v ${basedir_abs}:${basedir_abs}"
+docker_volumes+=" -v ${HOME}/.dl:/home/autotest-admin/.dl"
+docker_volumes+=" -v /tmp:/tmp"
 docker_environment="--env SSH_PRIVATE_KEY --env SSH_PRIVATE_KEY_BASE64 --env DO_VALIDATE --env SKIP_BUILD"
 uid=$(id -u ${USER})
 docker_userargs=
@@ -56,4 +54,4 @@ docker run ${docker_volumes} \
         $@ \
         cuaesd/aesd-autotest${dockertag} \
         ${docker_userargs} \
-        ${basedir_abs}/test.sh
+        ./test.sh
