@@ -5,6 +5,7 @@
 # You should call this from the base directory of your repository (the one
 # which contains test.sh)
 basedir_abs=$(realpath .)
+printenv
 if [ ! -f ${basedir_abs}/test.sh ]; then
     echo "Please run this script from a directory containing a test.sh file (typically the root of your repo)"
     exit 1
@@ -48,10 +49,10 @@ if [ $uid -ne 0 ]; then
     docker_userargs="-i $(id -u ${USER}) -g $(id -g ${USER})"
 fi
 docker_workdir="-w=${basedir_abs}"
+set -x
 if [ ! -z "${GITHUB_WORKSPACE}" ]; then
     docker_workdir="-w=${GITHUB_WORKSPACE}"
 fi
-set -x
 docker run ${docker_volumes} \
         ${docker_environment} \
         ${docker_workdir} \
