@@ -47,10 +47,14 @@ if [ $uid -ne 0 ]; then
     # outside a docker container
     docker_userargs="-i $(id -u ${USER}) -g $(id -g ${USER})"
 fi
+docker_workdir="-w=${basedir_abs}"
+if [ ! -z "${GITHUB_WORKSPACE}" ]; then
+    docker_workdir="-w=${GITHUB_WORKSPACE}"
+fi
 set -x
 docker run ${docker_volumes} \
         ${docker_environment} \
-        -w="${basedir_abs}" \
+        ${docker_workdir} \
         $@ \
         cuaesd/aesd-autotest${dockertag} \
         ${docker_userargs} \
