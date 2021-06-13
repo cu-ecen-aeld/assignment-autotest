@@ -1,7 +1,5 @@
-# Travis-CI
-[![Build Status](https://travis-ci.com/cu-ecen-5013/assignment-autotest.svg?branch=master)](https://travis-ci.com/cu-ecen-5013/assignment-autotest)
-# Gitlab-CI
-[![Build Status](https://gitlab.com/cu-ecen-aesd/assignment-autotest/badges/master/pipeline.svg)](https://gitlab.com/cu-ecen-aesd/assignment-autotest)
+# Github Actions Status
+[![Build Status](https://github.com/cu-ecen-aeld/assignment-autotest/actions/workflows/github-actions/badge.svg)](https://github.com/cu-ecen-aeld/assignment-autotest)
 
 # assignment-autotest
 A repository which can be used for autotest of assignments, leveraging the [Unity](https://github.com/ThrowTheSwitch/Unity)
@@ -75,20 +73,14 @@ as a template example
 
 ### CI Integration
 
-#### Travis-CI
-If you [setup Travis-CI Integration](https://docs.travis-ci.com/user/tutorial/#to-get-started-with-travis-ci-using-github), you can add automated CI testing to your base repo by following these steps.
-
-1. Copy the `test-basedir.sh` script to the repository containing this submodule and rename `./test.sh`
-2. Copy the `.travis.yml` file to the base directory of the repository containing this submodule.
-3. If desired, [add a badge](https://docs.travis-ci.com/user/status-images/) to your README.md showing build status.  See the line at the top of this README.md for an example.
-
-#### Gitlab-CI
-If you [setup Gitlab-CI Integration](https://docs.gitlab.com/ee/ci/ci_cd_for_external_repos/github_integration.html), you can add automated CI testing to your base
+#### Github Actions
+If you can add automated CI testing to your base
 repo by following these steps.
 
 1. Copy the `test-basedir.sh` script to the repository containing this submodule and rename `./test.sh`
-2. Copy the `.gitlab-ci.yml` file to the base directory of the repository containing this submodule.
-3. If desired, [add a badge](https://docs.gitlab.com/ee/user/project/badges.html) to your README.md showing build status.  See the line at the top of this README.md for an example.
+2. Copy the `.github` directory to the base directory of the repository containing this submodule and customize the
+    `workflow/github-actions.yml` file to perform testing for your implementation.
+3. If desired, [add a badge](https://docs.github.com/en/actions/managing-workflow-runs/adding-a-workflow-status-badge) to your README.md showing build status.  See the line at the top of this README.md for an example.
 
 
 ### Running An Example
@@ -103,7 +95,7 @@ are configured to use the same image.
 
 Start by setting up docker community edition on your host.  See install instructions [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/) for Ubuntu.
 
-You can run test in a docker container using the [docker/docker-run-test.sh](docker/docker-run-test.sh) script. This script is currently
+You can run test in a docker container using the [docker/run-test.sh](docker/run-test.sh) script. This script is currently
 setup to use the same image used for gitlab-ci testing, [cuaesd/aesd-autotest](https://hub.docker.com/repository/docker/cuaesd/aesd-autotest) but could be customized to use
 any docker container suitable for your assignments. 
 
