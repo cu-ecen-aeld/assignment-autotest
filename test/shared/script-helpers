@@ -82,7 +82,6 @@ validate_assignment2_checks() {
 
 	# scp the scripts required to validate the assignment 1 checks.
 	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P 10022 ${script_dir}/assignment-1-test.sh root@localhost:${executable_path}
-	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P 10022 ${script_dir}/assignment-1-test-iteration.sh root@localhost:${executable_path}
 	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P 10022 ${script_dir}/script-helpers root@localhost:${executable_path}
 	
 	ssh_cmd "${executable_path}/assignment-1-test.sh"

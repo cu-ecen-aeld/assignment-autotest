@@ -24,6 +24,4 @@ if [ $rc -ne 0 ]; then
         add_validate_error "tester.sh execution failed with return code $rc"
 fi
 
-assignment_1_test_validation ${filesdir} ${numfiles} ${writestr}
-
 rm -rf ${filesdir}
