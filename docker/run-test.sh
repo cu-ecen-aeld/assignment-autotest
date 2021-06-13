@@ -6,8 +6,8 @@
 # which contains test.sh)
 basedir_abs=$(realpath .)
 printenv
-if [ ! -f ${basedir_abs}/test.sh ]; then
-    echo "Please run this script from a directory containing a test.sh file (typically the root of your repo)"
+if [ ! -f ${basedir_abs}/full-test.sh ]; then
+    echo "Please run this script from a directory containing a full-test.sh file (typically the root of your repo)"
     exit 1
 fi
 assignment=$(cat ${basedir_abs}/conf/assignment.txt)
@@ -59,4 +59,4 @@ docker run ${docker_volumes} \
         $@ \
         cuaesd/aesd-autotest${dockertag} \
         ${docker_userargs} \
-        ./test.sh
+        ./full-test.sh
