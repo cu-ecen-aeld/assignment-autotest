@@ -8,6 +8,7 @@ source script-helpers
 
 script_dir="$(pwd -P )"
 testdir=$1
+rc=0
 
 # Invoke docker script with --env SKIP_BUILD=1 --env DO_VALIDATE=1 to perform a validation only
 # test
@@ -20,17 +21,21 @@ fi
 
 
 if [[ -z ${DO_VALIDATE} || ${DO_VALIDATE} -eq 1 ]]; then
-    echo "Starting validation step"
+    if [ -z "${validate_error}" ]; then
+        echo "Starting validation step"
 
-	# Running qemu instance in background
-	validate_qemu
+        # Running qemu instance in background
+        validate_qemu
 
-	# Validating test cases inside qemu
-	validate_assignment2_checks "${script_dir}" "/usr/bin/"
+        # Validating test cases inside qemu
+        validate_assignment2_checks "${script_dir}" "/usr/bin/"
 
-	echo "Killing qemu"
-	killall qemu-system-aarch64
-	popd
+        echo "Killing qemu"
+        killall qemu-system-aarch64
+        popd
+    else
+        echo "Build failed, skipping validation"
+    fi
 fi
 
 if [ ! -z "${validate_error}" ]; then

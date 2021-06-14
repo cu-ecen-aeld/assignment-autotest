@@ -472,15 +472,11 @@ before_script() {
 	mkdir -p ~/.ssh
 	chmod 775 ~/.ssh
 
-	##
-	## Optionally, if you will be using any Git commands, set the user name and
-	## and email.
-	##
-
+    # add known host for github
 	touch ~/.ssh/known_hosts
 	ssh-keyscan github.com >> ~/.ssh/known_hosts
-	#- git config --global user.email "user@example.com"
-	#- git config --global user.name "User name"
+    echo "Added known host github.com:"
+    cat ~/.ssh/known_hosts
 }
 
 # Validate the assignment 6 implementation against a running qemu instance
