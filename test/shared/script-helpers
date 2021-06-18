@@ -427,18 +427,6 @@ validate_output_file() {
 # We will use this logic in a before_script execution so we can use the same strategy
 # inside or outside a docker container
 before_script() {
-	##
-	## Install ssh-agent if not already installed, it is required by Docker.
-	## (change apt-get to yum if you use an RPM-based image)
-	##
-	which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
-
-	##
-	## Run ssh-agent (inside the build environment)
-	##
-	eval $(ssh-agent -s)
-	
-	
 	if [ -n "${SSH_PRIVATE_KEY_BASE64}" ]; then
 		# See https://serverfault.com/a/978369
 		# Use this to support gitlab CI requirements for environment variable masking
@@ -448,9 +436,21 @@ before_script() {
 	fi
 
     if [ -z "${SSH_PRIVATE_KEY}" ]; then
-        echo "Private key is not set, attempts to clone will fail"
+        echo "Private key is not set, attempts to clone may fail"
+        echo "Or CI environment may have setup SSH authentication already..."
     else
         echo "Setting private key"
+        ##
+        ## Install ssh-agent if not already installed, it is required by Docker.
+        ## (change apt-get to yum if you use an RPM-based image)
+        ##
+        which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+
+        ##
+        ## Run ssh-agent (inside the build environment)
+        ##
+        eval $(ssh-agent -s)
+
         set -e
         ##
         ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
@@ -470,13 +470,11 @@ before_script() {
 	## Create the SSH directory and give it the right permissions
 	##
 	mkdir -p ~/.ssh
-	chmod 775 ~/.ssh
 
     # add known host for github
 	touch ~/.ssh/known_hosts
 	ssh-keyscan github.com >> ~/.ssh/known_hosts
     echo "Added known host github.com:"
-    cat ~/.ssh/known_hosts
 }
 
 # Validate the assignment 6 implementation against a running qemu instance
