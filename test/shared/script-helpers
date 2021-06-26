@@ -517,8 +517,7 @@ valgrind_assignment6() {
 # This means compiling natively, then starting aesdsocket as daemon, then
 # running sockettest.sh against the running instance
 # Arguments: 1) The script directory containing the sockettest executable
-#            2) The source directory containing the aesdsocket application source code and makefile
-# TODO: should be possible to replace this with the assignment 6 native validation function instead
+#            2) The source directory containing the aesdsocket makefile and output file
 validate_assignment5_native() {
 	script_dir=${1}
     source_dir=${2}
@@ -528,7 +527,7 @@ validate_assignment5_native() {
     if [ $rc -ne 0 ]; then
         add_validate_error "make returned $rc attempting to build native application"
     fi
-    ./server/aesdsocket -d
+    ./aesdsocket -d
     rc=$?
     if [ $rc -ne 0 ]; then
         add_validate_error "starting aesdocket failed with $rc"
