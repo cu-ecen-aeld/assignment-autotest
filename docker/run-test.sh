@@ -39,15 +39,6 @@ docker_volumes="-v ${basedir_abs}:${basedir_abs}"
 docker_volumes+=" -v ${HOME}/.dl:/home/autotest-admin/.dl"
 docker_volumes+=" -v /tmp:/tmp"
 docker_environment="--env SSH_PRIVATE_KEY --env SSH_PRIVATE_KEY_BASE64 --env DO_VALIDATE --env SKIP_BUILD"
-uid=$(id -u ${USER})
-docker_userargs=
-if [ $uid -ne 0 ]; then
-    # If we are running as a non root account (ie not inside a docker container)
-    # specify user arguments we can use to run as the same user inside the container
-    # This allows us to share build content and support incremental builds inside or
-    # outside a docker container
-    docker_userargs="-i $(id -u ${USER}) -g $(id -g ${USER})"
-fi
 docker_workdir="-w=${basedir_abs}"
 set -x
 if [ ! -z "${GITHUB_WORKSPACE}" ]; then
@@ -58,5 +49,4 @@ docker run ${docker_volumes} \
         ${docker_workdir} \
         $@ \
         cuaesd/aesd-autotest${dockertag} \
-        ${docker_userargs} \
         ./full-test.sh
