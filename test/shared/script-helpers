@@ -528,7 +528,7 @@ validate_assignment5_native() {
     if [ $rc -ne 0 ]; then
         add_validate_error "make returned $rc attempting to build native application"
     fi
-    ./aesdsocket -d
+    ./server/aesdsocket -d
     rc=$?
     if [ $rc -ne 0 ]; then
         add_validate_error "starting aesdocket failed with $rc"
