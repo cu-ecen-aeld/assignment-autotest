@@ -574,7 +574,9 @@ validate_assignment6_native() {
     popd
 
     echo "Waiting for aesdsocket application with pid $PID to terminate"
-    while $(kill -0 $PID 2>/dev/null); do
+    while $(kill -0 $PID); do
+        echo "aesdsocket still running"
+        ps | grep $PID
         sleep 1
     done
     
