@@ -1,1 +1,4 @@
-assignment-7-unity-test.sh
+#!/bin/bash
+
+testdir=$1
+./unit-test.sh
