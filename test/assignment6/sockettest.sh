@@ -51,7 +51,7 @@ function test_send_socket_string
 	prev_file=$2
 	
 	new_file=`tempfile`
-	file_wo_ts="tempfile_wo_ts.txt"
+	file_wo_ts=`tempfile`
 
 	expected_file=`tempfile`
 	if [ "$string" = 'send_file' ]; then
