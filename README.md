@@ -1,6 +1,7 @@
 # Github Actions Status
-[![Build Status](https://github.com/cu-ecen-aeld/assignment-autotest/actions/workflows/github-actions/badge.svg)](https://github.com/cu-ecen-aeld/assignment-autotest)
+[![Build Status](https://github.com/cu-ecen-aeld/assignment-autotest/actions/workflows/github-actions.yml/badge.svg)
 
+    
 # assignment-autotest
 A repository which can be used for autotest of assignments, leveraging the [Unity](https://github.com/ThrowTheSwitch/Unity)
 automated test framework.
