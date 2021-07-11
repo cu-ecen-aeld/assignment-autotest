@@ -18,20 +18,21 @@ if [[ -z ${SKIP_BUILD} || ${SKIP_BUILD} -eq 0 ]]; then
     echo "Validation errors ${validate_error}"
 fi
 
+if [ -z "${validate_error}" ]; then
+    if [[ -z ${DO_VALIDATE} || ${DO_VALIDATE} -eq 1 ]]; then
+        echo "Starting validation step"
+        pushd ${testdir}
 
-if [[ -z ${DO_VALIDATE} || ${DO_VALIDATE} -eq 1 ]]; then
-    echo "Starting validation step"
-    pushd ${testdir}
+        # Running qemu instance in background
+        validate_qemu
 
-    # Running qemu instance in background
-    validate_qemu
+        # Validating test cases inside qemu
+        validate_assignment6_qemu "${script_dir}"
 
-    # Validating test cases inside qemu
-    validate_assignment6_qemu "${script_dir}"
-
-    echo "Killing qemu"
-    killall qemu-system-aarch64
-    popd
+        echo "Killing qemu"
+        killall qemu-system-aarch64
+        popd
+    fi
 fi
 
 if [ ! -z "${validate_error}" ]; then
