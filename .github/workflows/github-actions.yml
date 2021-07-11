@@ -2,10 +2,10 @@ name: assignment-autotest-test
 on: [push]
 jobs:
     test:
-        container: cuaesd/aesd-autotest
+        container: cuaesd/aesd-autotest:unit-test
         runs-on: ubuntu-latest
         steps:
           - uses: actions/checkout@v2
             name: Checkout submodules
           - uses: textbook/git-checkout-submodule-action@2.1.1
-          - run: ./test.sh
+          - run: ./full-test.sh
