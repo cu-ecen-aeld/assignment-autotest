@@ -1,5 +1,0 @@
-before_install:
-    - sudo apt-get install -y ruby
-language: c
-script:
-    - ./test.sh
