@@ -142,8 +142,10 @@ thread2_in_progress=`mktemp`
 thread3_in_progress=`mktemp`
 function test_socket_thread1
 {
-	for (( c=1; c <= ${process_send_count}; c++ ))
+	local c
+	for (( c=1; c<=${process_send_count}; c++ ))
 	do
+		echo "Sending string ${string2} from process 1: instance ${c}"
 		echo ${string1} | nc ${target} ${port} -w 1 > /dev/null
 	done
 	echo "Process 1 complete"
@@ -152,8 +154,10 @@ function test_socket_thread1
 
 function test_socket_thread2
 {	
-	for (( c=1; c <= ${process_send_count}; c++ ))
+	local c
+	for (( c=1; c<=${process_send_count}; c++ ))
 	do
+		echo "Sending string ${string2} from process 2: instance ${c}"
 		echo ${string2} | nc ${target} ${port} -w 1 > /dev/null
 	done
 	echo "Process 2 complete"
@@ -162,8 +166,10 @@ function test_socket_thread2
 
 function test_socket_thread3
 {
-	for (( c=1; c <= ${process_send_count}; c++ ))
+	local c
+	for (( c=1; c<=${process_send_count}; c++ ))
 	do
+		echo "Sending string ${string3} from process 3: instance ${c}"
 		echo ${string3} | nc ${target} ${port} -w 1  > /dev/null
 	done
 	echo "Process 3 complete"
@@ -173,8 +179,6 @@ function test_socket_thread3
 # Tests to ensure socket multithreaded send/receive is working properly on an aesdsocket utility
 function validate_multithreaded
 {
-	
-
 	echo "Waiting for sends to compete on all processes" 
 	while [  -f ${thread1_in_progress} -o -f ${thread2_in_progress} -o -f ${thread3_in_progress} ]; do
 		sleep 1
