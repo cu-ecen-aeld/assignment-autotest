@@ -19,4 +19,3 @@ if [ $rc -ne 0 ]; then
 fi
 
 popd
-exit $rc
