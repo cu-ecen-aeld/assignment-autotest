@@ -40,6 +40,7 @@ docker_volumes+=" -v ${HOME}/.dl:/home/autotest-admin/.dl"
 docker_volumes+=" -v /tmp:/tmp"
 docker_environment="--env SSH_PRIVATE_KEY --env SSH_PRIVATE_KEY_BASE64 --env DO_VALIDATE --env SKIP_BUILD"
 docker_workdir="-w=${basedir_abs}"
+docker_user="--user=1001:1001"
 set -x
 if [ ! -z "${GITHUB_WORKSPACE}" ]; then
     docker_workdir="-w=${GITHUB_WORKSPACE}"
@@ -47,6 +48,7 @@ fi
 docker run ${docker_volumes} \
         ${docker_environment} \
         ${docker_workdir} \
+        ${docker_user} \
         $@ \
         cuaesd/aesd-autotest${dockertag} \
         ./full-test.sh
