@@ -2,15 +2,15 @@
 # 1st argument: absolute or relative path to the base directory
 # Defaults to dirname `git rev-parse --absolute-git-dir` if not specified
 
-echo "STEPS TO MANUALLY TEST ASSIGNMENT 8"
+echo "STEPS TO MANUALLY TEST ASSIGNMENT 8 on your native machine"
+echo "These steps are useful for debugging your application before attempting to run on"
+echo "an embedded target"
 
-echo "After following steps 3 and 4,"
-echo "CD into your aesd-char-driver DIRECTORY and do a make."
-echo "RUN ./aesdchar_unload, followed by ./aesdchar_load"
-echo "From you main root assignment directory,"
+echo "After following assignment implementation steps"
+echo "cd into your aesd-char-driver DIRECTORY and do a make to build for your development machine."
+echo "RUN ./aesdchar_unload, followed by ./aesdchar_load to load your module on your development machine"
+echo "From your main root assignment directory,"
 echo "RUN ./assignment-autotest/test/assignment8/drivertest.sh to verify you implementation"
 
-echo "After following step 5, unload and load your aesdchar device"
-echo "From you main root assignment directory"
-echo "RUN your aesdsocket"
-echo "And verify with it runs against sockettest.sh by running ./assignment-autotest/test/assignment8/sockettest.sh"
+echo "When drivertest succeeds, start your modified aesdsocket application from the server subdirectory"
+echo "Verify it passes sockettest.sh by running ./assignment-autotest/test/assignment8/sockettest.sh"
