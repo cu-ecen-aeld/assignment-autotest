@@ -1,1 +1,1 @@
-../assignment6-yocto/yocto-common-build.sh
+../shared/yocto-common-build.sh
