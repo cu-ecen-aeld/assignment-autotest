@@ -27,3 +27,8 @@ rc=$?
 if [ $rc -ne 0 ]; then
 	add_validate_error "finder-test.sh execution failed with return code $rc"
 fi
+
+if [ ! -z "${validate_error}" ]; then
+    echo "Validation failed with error list ${validate_error}"
+    exit 1
+fi
