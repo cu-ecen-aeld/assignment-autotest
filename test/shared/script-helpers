@@ -538,9 +538,52 @@ validate_assignment5_native() {
     if [ $rc -ne 0 ]; then
         add_validate_error "sockettest.sh returned $rc attempting to run against native compiled aesdsocket instance"
     fi
-    pkill aesdsocket
+	PID=$(pgrep aesdsocket)
+    kill $PID
     popd
     popd
+
+    echo "Waiting for aesdsocket application with pid $PID to terminate"
+    wait_exit=1
+    while [ $wait_exit -ne 0 ]; do
+        kill -0 ${PID}
+        wait_exit=$?
+        if [ $wait_exit -ne 0 ]; then
+            ps -q $PID | grep "defunct"
+            wait_exit=$?
+            if [ $wait_exit -ne 0 ]; then
+                echo "aesdsocket still running"
+                sleep 1
+            fi
+        fi
+    done
+    
+    echo "Re-running sockettest.sh with valgrind"
+    pushd ${source_dir}
+    valgrind_marker=$(mktemp)
+    valgrind_assignment6 $valgrind_marker &
+    pushd ${script_dir}
+    while [ 1 ]; do
+       # Write timestamp: while waiting for start since these get filtered out during the diff check	
+       echo "timestamp:wait-for-startup" | nc localhost 9000 -w 1 | grep "timestamp:wait-for-startup"
+       if [ $? -eq 0 ]; then
+           break;
+       fi
+       echo "Waiting for aesdsocket application to start"
+       sleep 1
+    done
+    ./sockettest.sh
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        add_validate_error "sockettest.sh returned $rc attempting to run against native compiled aesdsocket instance running under valgrind"
+    fi
+    PID=$(pgrep -f "valgrind.*aesdsocket")
+    echo "Stopping valgrind and aesdsocket process at pid $PID"
+    kill $PID
+    while [ -f $valgrind_marker ]; do
+        echo "Waiting for aesdsocket and valgrind to exit"  
+        sleep 1 
+    done 
 }
 
 # Validate the assignment 6 implementation against native code
