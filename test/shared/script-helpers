@@ -563,15 +563,8 @@ validate_assignment5_native() {
     valgrind_marker=$(mktemp)
     valgrind_assignment6 $valgrind_marker &
     pushd ${script_dir}
-    while [ 1 ]; do
-       # Write timestamp: while waiting for start since these get filtered out during the diff check	
-       echo "timestamp:wait-for-startup" | nc localhost 9000 -w 1 | grep "timestamp:wait-for-startup"
-       if [ $? -eq 0 ]; then
-           break;
-       fi
-       echo "Waiting for aesdsocket application to start"
-       sleep 1
-    done
+    echo "Waiting for aesdsocket application to start"
+    sleep 1
     ./sockettest.sh
     rc=$?
     if [ $rc -ne 0 ]; then
