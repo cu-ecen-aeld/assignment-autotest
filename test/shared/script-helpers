@@ -533,7 +533,7 @@ assignment6_assignment5_run_valgrind()
     echo "Re-running sockettest.sh with valgrind"
     pushd ${source_dir}
     valgrind_marker=$(mktemp)
-    valgrind_assignment6 $valgrind_marker &
+    valgrind_assignment6_assignment5 $valgrind_marker &
     pushd ${script_dir}
 }
 
