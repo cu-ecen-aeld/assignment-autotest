@@ -18,7 +18,7 @@ add_validate_error() {
 # @parameter1: command to be executed inside qemu.
 #       If you need to send more than one parameter, enclose in quotes
 ssh_cmd() {
-	cmd=$1 
+	cmd=$1
 	sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@localhost -p 10022 ${cmd}
 }
 
@@ -51,7 +51,7 @@ wait_for_qemu(){
 			cat ${tmpfile}
 		fi
 	done
-} 
+}
 
 validate_driver_assignment7() {
     ssh_cmd lsmod >> result.txt
@@ -67,7 +67,7 @@ validate_driver_assignment7() {
 # This function runs runqemu.sh in background and waits for qemu to boot up.
 validate_qemu(){
 	echo "Executing runqemu.sh in background"
-	
+
 	./runqemu.sh &
 	wait_for_qemu
 }
@@ -83,7 +83,7 @@ validate_assignment2_checks() {
 	# scp the scripts required to validate the assignment 1 checks.
 	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P 10022 ${script_dir}/assignment-1-test.sh root@localhost:${executable_path}
 	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P 10022 ${script_dir}/script-helpers root@localhost:${executable_path}
-	
+
 	ssh_cmd "${executable_path}/assignment-1-test.sh"
 	rc=$?
 	if [ $rc -ne 0 ]; then
@@ -102,7 +102,7 @@ validate_buildroot_config() {
 		echo "Adding Dropbear Support manually"
 		echo 'BR2_PACKAGE_DROPBEAR=y' >> "${DEFCONFIG_BASE_EXTERNAL}"
 	fi
-	
+
 	grep -q 'BR2_PACKAGE_AESD_ASSIGNMENTS=y' "${DEFCONFIG_BASE_EXTERNAL}"
 	rc=$?
 	if [ $rc -ne 0 ]; then
@@ -110,13 +110,13 @@ validate_buildroot_config() {
 		echo "Adding AESD_ASSIGNMENTS package manually"
 		echo 'BR2_PACKAGE_AESD_ASSIGNMENTS=y' >> "${DEFCONFIG_BASE_EXTERNAL}"
 	fi
-	
+
 	grep -q 'BR2_TARGET_GENERIC_ROOT_PASSWD="root"' "${DEFCONFIG_BASE_EXTERNAL}"
-	rc=$?	
+	rc=$?
 	if [ $rc -ne 0 ]; then
 		add_validate_error "Root password not added in aesd_qemu_defconfig"
 		echo "Setting password to root manually"
-		echo 'BR2_TARGET_GENERIC_ROOT_PASSWD="root"' >> "${DEFCONFIG_BASE_EXTERNAL}"	
+		echo 'BR2_TARGET_GENERIC_ROOT_PASSWD="root"' >> "${DEFCONFIG_BASE_EXTERNAL}"
 	fi
 }
 
@@ -179,7 +179,7 @@ validate_aesdsocketdata_removal() {
 
 
 # This function validates if the aesdsocket program has implemented a signal handler catching signals SIGTERM and SIGINT
-# The aesdsocket program must be running before calling this functions 
+# The aesdsocket program must be running before calling this functions
 validate_signal_handlers() {
 	echo "validating signal handlers for SIGTERM and SIGINT"
 
@@ -198,7 +198,7 @@ validate_signal_handlers() {
 	# Running the program again
 	echo "Running aesdsocket program again"
 	# The below command does not work unless run in background. Can't seem to understand why.
-	ssh_cmd "/usr/bin/aesdsocket -d" &		
+	ssh_cmd "/usr/bin/aesdsocket -d" &
 	rc=$?
 
 	sleep 5s
@@ -224,14 +224,14 @@ validate_signal_handlers() {
 ## TODO: Recheck this function implementation
 validate_error_checks() {
 	echo "validating error codes"
-		
-	ssh_cmd "/usr/bin/aesdsocket -d" & 
+
+	ssh_cmd "/usr/bin/aesdsocket -d" &
 	rc=$?
 	if [ $rc -eq 0 ]; then
 		sleep 5s
 
 		## TODO Check this might get stuck if failed actually
-		ssh_cmd "/usr/bin/aesdsocket -d" 
+		ssh_cmd "/usr/bin/aesdsocket -d"
 		rc=$?
 		sleep 5s
 		if [ $rc -ne 0 ]; then
@@ -272,7 +272,7 @@ validate_makefile_and_memoryleak() {
 		PATH_EXEC=$(find ${MAKEFILE_PATH} -name "aesdsocket")
 		valgrind --error-exitcode=1 --leak-check=full --show-leak-kinds=all --track-origins=yes --errors-for-leak-kinds=definite --verbose --log-file=valgrind-out.txt ./${PATH_EXEC}&
 		sleep 10s
-		
+
 		# Running sockettest script here to take care of all memory leaks possible
 		echo "Running sockettest.sh for Valgrind test"
 		#${script_dir}/sockettest.sh -t localhost
@@ -340,13 +340,13 @@ validate_makefile_flags() {
 # This function copies the required file to the directory ~/assignment4_build_binaries/<basename ${1}>
 # @parameter1: This parameter is the path to the root directory of the github repository.
 save_build_binaries() {
-	docker_buildroot_shared_dir=/var/aesd/buildroot-shared	
+	docker_buildroot_shared_dir=/var/aesd/buildroot-shared
 	student_folder=$(basename ${1})
 	student_folder_path=${docker_buildroot_shared_dir}/students_build_binaries/${student_folder}
 	mkdir -p ${student_folder_path}
 	echo "Directory consisting of build binaries at ${student_folder_path} created"
 	cp buildroot/output/images/Image ${student_folder_path}
-       	cp buildroot/output/images/rootfs.ext4 ${student_folder_path}	
+       	cp buildroot/output/images/rootfs.ext4 ${student_folder_path}
 }
 
 
@@ -359,30 +359,30 @@ fetch_output_file() {
 		rc=$?
 		if [ $rc -eq 0 ]; then
 			sshpass -p 'root' scp -P 10022 root@localhost:~/assignments/assignment4/assignment-4-result.txt test_result
-			rc=$?			
+			rc=$?
 			if [ $rc -ne 0 ]; then
-				sshpass -p 'root' scp -P 10022 root@localhost:/root/assignment-4-result.txt test_result 
-				rc=$?				
+				sshpass -p 'root' scp -P 10022 root@localhost:/root/assignment-4-result.txt test_result
+				rc=$?
 				if [ $rc -ne 0 ]; then
 					add_validate_error "Failed to SCP assignment-4-result.txt from remote !!!"
 				fi
 			else
 				add_validate_error "assignment-4-result.txt found but not located at ~/ Dir"
 			fi
-			
-			sshpass -p 'root' scp -P 10022 root@localhost:/tmp/ecen5013/ECEN_5013_IS_AWESOME10 test_result 
+
+			sshpass -p 'root' scp -P 10022 root@localhost:/tmp/ecen5013/ECEN_5013_IS_AWESOME10 test_result
 			rc=$?
 			if [ $rc -ne 0 ]; then
 				sshpass -p 'root' scp -P 10022 root@localhost:/tmp/aesd-data/AESD_IS_AWESOME10 test_result
-				rc=$?				
-				if [ $rc -ne 0 ]; then 
+				rc=$?
+				if [ $rc -ne 0 ]; then
 					add_validate_error "Failed to SCP ECEN_5013_IS_AWESOME10 from remote !!!"
 				fi
 			fi
-			
+
 			break;
 		fi
-		
+
 #		if [ $i -eq 20 ]; then
 #			add_validate_error "Failed to SSH in QEMU !!!"
 #		fi
@@ -397,11 +397,11 @@ validate_output_file() {
 	fetch_output_file
 
 	cat test_result/assignment-4-result.txt | grep "The number of files are 10 and the number of matching lines are 10"
-	rc=$?	
+	rc=$?
 	if [ $rc -ne 0 ]; then
 		add_validate_error "Text in assignment4-result.txt file not as expected !!!"
 	fi
-	
+
 	cat test_result/ECEN_5013_IS_AWESOME10 | grep "${githubstudent}"
 	rc=$?
 	if [ $rc -ne 0 ]; then
@@ -411,7 +411,7 @@ validate_output_file() {
 			add_validate_error "Expected Github Usename: ${githubstudent} but found no match"
 		fi
 	fi
-	
+
 	cat test_result/ECEN_5013_IS_AWESOME10 | grep "1970"
 	rc=$?
 	if [ $rc -ne 0 ]; then
@@ -529,7 +529,7 @@ assignment6_assignment5_run_valgrind()
             fi
         fi
     done
-    
+
     echo "Re-running sockettest.sh with valgrind"
     pushd ${source_dir}
     valgrind_marker=$(mktemp)
@@ -568,7 +568,7 @@ validate_assignment5_native() {
     popd
 	assignment6_assignment5_run_valgrind
     echo "Waiting for aesdsocket application to start"
-    sleep 1
+    sleep 3
     ./sockettest.sh
     rc=$?
     if [ $rc -ne 0 ]; then
@@ -578,9 +578,9 @@ validate_assignment5_native() {
     echo "Stopping valgrind and aesdsocket process at pid $PID"
     kill $PID
     while [ -f $valgrind_marker ]; do
-        echo "Waiting for aesdsocket and valgrind to exit"  
-        sleep 1 
-    done 
+        echo "Waiting for aesdsocket and valgrind to exit"
+        sleep 1
+    done
 }
 
 # Validate the assignment 6 implementation against native code
@@ -615,7 +615,7 @@ validate_assignment6_native() {
 
 	assignment6_assignment5_run_valgrind
     while [ 1 ]; do
-       # Write timestamp: while waiting for start since these get filtered out during the diff check	
+       # Write timestamp: while waiting for start since these get filtered out during the diff check
        echo "timestamp:wait-for-startup" | nc localhost 9000 -w 1 | grep "timestamp:wait-for-startup"
        if [ $? -eq 0 ]; then
            break;
@@ -632,36 +632,36 @@ validate_assignment6_native() {
     echo "Stopping valgrind and aesdsocket process at pid $PID"
     kill $PID
     while [ -f $valgrind_marker ]; do
-        echo "Waiting for aesdsocket and valgrind to exit"  
-        sleep 1 
-    done 
+        echo "Waiting for aesdsocket and valgrind to exit"
+        sleep 1
+    done
 }
 
 validate_assignment7_qemu() {
 	echo "Validating assignment 7 in QEMU"
 
     validate_driver_assignment7
-	
+
 	cat result.txt | grep "hello"
 	if [ $? -ne 0 ]; then
 		add_validate_error "hello module not loaded on boot !!!"
 	fi
-	
+
 	cat result.txt | grep "faulty"
 	if [ $? -ne 0 ]; then
 		add_validate_error "faulty module not loaded on boot !!!"
 	fi
-	
+
 	cat result.txt | grep "scull"
 	if [ $? -ne 0 ]; then
 		add_validate_error "scull module not loaded on boot !!!"
 	fi
-	
+
 	cat result.txt | grep "${githubstudent}"
 	if [ $? -ne 0 ]; then
 		add_validate_error "Github Username not found in hello module !!!"
 	fi
-	
+
 	rm -f result.txt
 }
 
@@ -671,7 +671,7 @@ validate_aesdchar() {
 		if [ $? -eq 0 ]; then
 		    ssh_cmd "rmmod aesdchar"
         else
-		    add_validate_error "aesdchar driver not loaded at startup"	
+		    add_validate_error "aesdchar driver not loaded at startup"
 		fi
 		ssh_cmd "modprobe aesdchar"
 
