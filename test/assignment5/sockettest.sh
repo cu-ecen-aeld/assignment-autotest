@@ -45,8 +45,8 @@ function test_send_socket_string
 {
 	string=$1
 	prev_file=$2
-	new_file=`tempfile`
-	expected_file=`tempfile`
+	new_file=$(mktemp)
+	expected_file=$(mktemp)
 
 	echo "sending string ${string} to ${target} on port ${port}"
 	echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
@@ -71,7 +71,7 @@ function test_send_socket_string
 	fi
 }
 
-comparefile=`tempfile`
+comparefile=$(mktemp)
 test_send_socket_string "abcdefg" ${comparefile}
 test_send_socket_string "hijklmnop" ${comparefile}
 test_send_socket_string "1234567890" ${comparefile}
