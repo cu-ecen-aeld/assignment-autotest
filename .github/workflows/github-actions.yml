@@ -6,6 +6,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - uses: actions/checkout@v2
-            name: Checkout submodules
-          - uses: textbook/git-checkout-submodule-action@2.1.1
-          - run: ./full-test.sh
+          - name: Checkout submodules
+            run : git submodule update --init --recursive
+          - name: Run unit test
+            run: ./full-test.sh
