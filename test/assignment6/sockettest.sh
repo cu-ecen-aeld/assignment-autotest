@@ -202,7 +202,7 @@ function validate_multithreaded
 			echo "But expected ${process_send_count} instances"
 		fi
 
-		if [ ${count_thread1} -ne ${process_send_count} ]; then
+		if [ ${count_thread2} -ne ${process_send_count} ]; then
 			echo "Found $count_thread2 instance of string -> $string2 in ${new_file} "
 			echo "But expected ${process_send_count} instances"
 		fi
