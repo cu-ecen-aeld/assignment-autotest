@@ -15,6 +15,7 @@ mkdir -p ${BR2_DL_DIR}
 # Remove config if it exists, to clear any previous partial runs
 rm -rf buildroot/.config
 
+
 # Validating if aesd-assignments.mk has ssh link
 grep "^AESD_ASSIGNMENTS_SITE[[:space:]]*=[[:space:]]*https" base_external/package/aesd-assignments/aesd-assignments.mk
 rc=$?

@@ -29,6 +29,7 @@ ssh_cmd() {
 add_to_rootfs() {
 	path_to_file=$1
 	rootfs_location=$2
+	echo "adding ${path_to_file} to the rootfs at ${rootfs_location}"
 	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P  10022 ${path_to_file} root@localhost:${rootfs_location}
 }
 
@@ -720,5 +721,5 @@ validate_driver_assignment9() {
 }
 
 validate_application_assignment9() {
-    validate_application_assignment8
+    validate_application_assignment8 "$@"
 }
