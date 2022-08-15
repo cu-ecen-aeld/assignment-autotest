@@ -7,38 +7,37 @@ source script-helpers
 
 script_dir="$(pwd -P )"
 testdir=$1
+rootfs_path=/usr/bin
 
 # Invoke docker script with --env SKIP_BUILD=1 --env DO_VALIDATE=1 to perform a validation only
 # test
 echo "starting test with SKIP_BUILD ${SKIP_BUILD} and DO_VALIDATE ${DO_VALIDATE}"
 if [[ -z ${SKIP_BUILD} || ${SKIP_BUILD} -eq 0 ]]; then
-	pushd ${testdir}
+    pushd ${testdir}
     . ${script_dir}/buildroot-common-build.sh
     rc=$?
     echo "build step complete with status $?"
     echo "Validation errors ${validate_error}"
-	popd
+    popd
 fi
 
-add_to_rootfs "${script_dir}/drivertest.sh" "${rootfs_path}"
 
 if [[ -z ${DO_VALIDATE} || ${DO_VALIDATE} -eq 1 ]]; then
     echo "Starting validation step"
-	pushd ${testdir}
+    pushd ${testdir}
 
-	# Running qemu instance in background
-	validate_qemu
+    # Running qemu instance in background
+    validate_qemu
 
-	# Validating test cases inside qemu
-	validate_assignment7_qemu
+    add_to_rootfs "${script_dir}/drivertest.sh" "${rootfs_path}"
 
-	validate_driver_assignment8
+    validate_driver_assignment9
 
-	validate_application_assignment8 "${script_dir}"
+    validate_application_assignment9 "${script_dir}"
 
-	echo "Killing qemu"
-	killall qemu-system-aarch64
-	popd
+    echo "Killing qemu"
+    killall qemu-system-aarch64
+    popd
 fi
 
 if [ ! -z "${validate_error}" ]; then

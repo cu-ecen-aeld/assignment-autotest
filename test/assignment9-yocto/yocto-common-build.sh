@@ -1,0 +1,1 @@
+../shared/yocto-common-build.sh
