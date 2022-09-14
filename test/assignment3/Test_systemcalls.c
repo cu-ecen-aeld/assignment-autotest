@@ -29,7 +29,8 @@ void test_systemcalls()
 {
 
     printf("Running tests at %s : function %s\n",__FILE__,__func__);
-    do_system("echo this is a test > " REDIRECT_FILE );
+    TEST_ASSERT_TRUE_MESSAGE(do_system("echo this is a test > " REDIRECT_FILE ),
+            "do_system call should return true running echo command");
     char *test_string = malloc_first_line_of_file(REDIRECT_FILE);
     printf("system() echo this is a test returned %s\n", test_string);
     // Testing implementation with testfile.txt output 
@@ -38,7 +39,8 @@ void test_systemcalls()
             " Is your system() function implemented properly?");
     free((void *)test_string);
     
-    do_system("echo \"home is $HOME\" > " REDIRECT_FILE);
+    TEST_ASSERT_TRUE_MESSAGE(do_system("echo \"home is $HOME\" > " REDIRECT_FILE),
+             "do_system call should return true running echo command");
     test_string = malloc_first_line_of_file(REDIRECT_FILE);
     int test_value = strncmp(test_string, "home is /", 9);
     printf("system() echo home is $HOME returned: %s\n", test_string);
