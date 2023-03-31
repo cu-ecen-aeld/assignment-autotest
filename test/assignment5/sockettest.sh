@@ -118,8 +118,8 @@ fi
 
 if [ -e multiple_packets.txt ]; then
     echo "Sending Multiple packets from multiple_packets.txt file"
-
-    sendstring=`cat multiple_packets.txt`
+	
+	sendstring=`cat multiple_packets.txt`
 
 	test_send_multiple_packets "${sendstring}" "${comparefile}"
 
