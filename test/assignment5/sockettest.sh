@@ -73,40 +73,6 @@ function test_send_socket_string
 	fi
 }
 
-# Test that sends multiple packets at once
-# @param1 : The string to send
-# @param2 : The previous compare file
-# Returns if the test passes, exits with error if the test fails.
-function test_send_multiple_packets
-{
-	string=$1
-	prev_file=$2
-	new_file=$(mktemp)
-	expected_file=$(mktemp)
-
-	echo "sending string: ${string} to ${target} on port ${port}"
-	printf "${string}" | nc ${target} ${port} -w 1 > ${new_file}
-	cp ${prev_file} ${expected_file}
-	printf "${string}" >> ${expected_file}
-	
-	diff ${expected_file} ${new_file} > /dev/null
-	if [ $? -ne 0 ]; then
-		echo "Differences found after sending: ${string} to ${target} on port ${port}"
-		echo "Expected contents to match:"
-		cat ${expected_file}
-		echo -e "\nBut found contents:"
-		cat ${new_file}
-		echo -e "\nWith differences"
-		diff -u ${expected_file} ${new_file}
-		echo "Test complete with failure"
-		exit 1
-	else
-		cp ${expected_file} ${prev_file}
-		rm ${new_file}
-		rm ${expected_file}
-	fi
-}
-
 comparefile=$(mktemp)
 test_send_socket_string "abcdefg" ${comparefile}
 test_send_socket_string "hijklmnop" ${comparefile}
