@@ -145,7 +145,7 @@ function test_socket_thread1
 	local c
 	for (( c=1; c<=${process_send_count}; c++ ))
 	do
-		echo "Sending string ${string2} from process 1: instance ${c}"
+		echo "Sending string ${string1} from process 1: instance ${c}"
 		echo ${string1} | nc ${target} ${port} -w 1 > /dev/null
 	done
 	echo "Process 1 complete"
