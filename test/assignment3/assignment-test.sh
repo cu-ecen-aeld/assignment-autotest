@@ -29,7 +29,7 @@ if [[ -z ${DO_VALIDATE} || ${DO_VALIDATE} -eq 1 ]]; then
     ./start-qemu-app.sh ${OUTDIR} &
     echo "Wait for app to finish"
     # See https://stackoverflow.com/a/6456103
-    timeout ${qemu_timeout} grep -q "finder-app execution complete" <(tail -f ${logfile})
+    timeout ${qemu_timeout} grep -q "Completed with success!!" <(tail -f ${logfile})
     rc=$?
     if [ $rc -ne 0 ]; then
         add_validate_error "Running finder application on qemu failed with return code $rc, see ${logfile} for details"
