@@ -11,8 +11,7 @@ static inline char *malloc_username_from_conf_file()
 {
     size_t len = 0;
     // Note: this buffer will be reallocated in getline() as necessary
-    char *buffer = malloc(len + 1);
-    buffer[0] = '\0';
+    char *buffer = NULL;
 
     FILE *fp = fopen("conf/username.txt","r");
     if ( fp != NULL ) {
@@ -39,6 +38,7 @@ static inline char *malloc_username_from_conf_file()
         } else {
             printf("Read %s from conf/username.txt\n", buffer);
         }
+        fclose(fp);
     } else {
         fprintf(stderr, "Could not open conf/username.txt for reading\n");
     }
