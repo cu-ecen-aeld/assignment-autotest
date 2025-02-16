@@ -4,6 +4,8 @@
 pushd `dirname $0`
 target=localhost
 port=9000
+multi_line_string="first packet\n01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901\nthird packet"
+multi_line_string_test=true
 function printusage
 {
 	echo "Usage: $0 [-t target_ip] [-p port]"
@@ -48,19 +50,19 @@ function test_send_socket_string
 	new_file=$(mktemp)
 	expected_file=$(mktemp)
 
-	echo "sending string ${string} to ${target} on port ${port}"
-	echo ${string} | nc ${target} ${port} -w 1 > ${new_file}
+	echo -e "sending string ${string} to ${target} on port ${port}"
+	echo -e "${string}" | nc ${target} ${port} -w 1 > ${new_file}
 	cp ${prev_file} ${expected_file}
-	echo ${string} >> ${expected_file}
+	echo -e "${string}" >> ${expected_file}
 	
 	diff ${expected_file} ${new_file} > /dev/null
 	if [ $? -ne 0 ]; then
-		echo "Differences found after sending ${string} to ${target} on port ${port}"
+		echo -e "Differences found after sending: ${string} to ${target} on port ${port}"
 		echo "Expected contents to match:"
 		cat ${expected_file}
-		echo "But found contents:"
+		echo -e "\nBut found contents:"
 		cat ${new_file}
-		echo "With differences"
+		echo -e "\nWith differences"
 		diff -u ${expected_file} ${new_file}
 		echo "Test complete with failure"
 		exit 1
@@ -81,7 +83,19 @@ if [ -e long_string.txt ]; then
     sendstring=`cat long_string.txt`
     test_send_socket_string ${sendstring} ${comparefile}
 fi
+
+if [ "$multi_line_string_test" = true ]; then
+    echo "Sending Multiple packets from multiple_packets.txt file"
+
+    sendstring=$multi_line_string
+
+    test_send_socket_string "${sendstring}" "${comparefile}"
+
+fi
+
 echo "Full contents sent:"
 cat ${comparefile}
 rm ${comparefile}
 echo "Tests complete with success!"
+
+
