@@ -667,7 +667,10 @@ validate_assignment7_qemu() {
 }
 
 validate_aesdchar() {
-        echo "Adding and removing aesdchar driver"
+		echo "Killing /usr/bin/aesdsocket"
+		ssh_cmd 'kill -s 2 $(pidof /usr/bin/aesdsocket)'
+
+		echo "Adding and removing aesdchar driver"
 		ssh_cmd "lsmod | grep \"aesdchar\""
 		if [ $? -eq 0 ]; then
 		    ssh_cmd "rmmod aesdchar"
@@ -676,6 +679,9 @@ validate_aesdchar() {
 		fi
 		ssh_cmd "modprobe aesdchar"
 
+		echo "Running aesdsocket as daemon manually"
+		ssh_cmd "/usr/bin/aesdsocket -d" &
+		sleep 5s
 }
 validate_driver_assignment8() {
 
