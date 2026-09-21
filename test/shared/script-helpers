@@ -516,19 +516,14 @@ valgrind_assignment6_assignment5() {
 
 assignment6_assignment5_run_valgrind()
 {
-	echo "Waiting for aesdsocket application with pid $PID to terminate"
-    wait_exit=1
-    while [ $wait_exit -ne 0 ]; do
+    echo "Waiting for aesdsocket application with pid $PID to terminate"
+    while true; do
         kill -0 ${PID}
-        wait_exit=$?
-        if [ $wait_exit -ne 0 ]; then
-            ps -q $PID | grep "defunct"
-            wait_exit=$?
-            if [ $wait_exit -ne 0 ]; then
-                echo "aesdsocket still running"
-                sleep 1
-            fi
+        if [ $? -ne 0 ]; then
+            break;
         fi
+        echo "aesdsocket still running"
+        sleep 1
     done
 
     echo "Re-running sockettest.sh with valgrind"
