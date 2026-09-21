@@ -6,6 +6,9 @@ export validate_error=
 # See https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 RED='\033[0;31m'
 NC='\033[0m' # No Color
+SCP_OPTS=""
+SSH_VERSION=$(ssh -V 2>&1 | grep -oP 'OpenSSH_\K[0-9]+\.[0-9]+')
+test -n "$SSH_VERSION" && awk -v ver="$SSH_VERSION" 'BEGIN {exit !(ver >= 9.0)}' && SCP_OPTS="-O"
 
 add_validate_error() {
 	validate_error="${validate_error}:$1"
@@ -30,7 +33,7 @@ add_to_rootfs() {
 	path_to_file=$1
 	rootfs_location=$2
 	echo "adding ${path_to_file} to the rootfs at ${rootfs_location}"
-	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P  10022 ${path_to_file} root@localhost:${rootfs_location}
+	sshpass -p 'root' scp ${SCP_OPTS} -o StrictHostKeyChecking=no -P  10022 ${path_to_file} root@localhost:${rootfs_location}
 }
 
 #This function waits for the qemu to boot up.
@@ -82,8 +85,8 @@ validate_assignment2_checks() {
 	executable_path=${2}
 
 	# scp the scripts required to validate the assignment 1 checks.
-	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P 10022 ${script_dir}/assignment-1-test.sh root@localhost:${executable_path}
-	sshpass -p 'root' scp -o StrictHostKeyChecking=no -P 10022 ${script_dir}/script-helpers root@localhost:${executable_path}
+	sshpass -p 'root' scp ${SCP_OPTS} -o StrictHostKeyChecking=no -P 10022 ${script_dir}/assignment-1-test.sh root@localhost:${executable_path}
+	sshpass -p 'root' scp ${SCP_OPTS} -o StrictHostKeyChecking=no -P 10022 ${script_dir}/script-helpers root@localhost:${executable_path}
 
 	ssh_cmd "${executable_path}/assignment-1-test.sh"
 	rc=$?
@@ -359,25 +362,25 @@ fetch_output_file() {
 		ssh_cmd "tester.sh"
 		rc=$?
 		if [ $rc -eq 0 ]; then
-			sshpass -p 'root' scp -P 10022 root@localhost:~/assignments/assignment4/assignment-4-result.txt test_result
+			sshpass -p 'root' scp ${SCP_OPTS} -P 10022 root@localhost:~/assignments/assignment4/assignment-4-result.txt test_result
 			rc=$?
 			if [ $rc -ne 0 ]; then
-				sshpass -p 'root' scp -P 10022 root@localhost:/root/assignment-4-result.txt test_result
+				sshpass -p 'root' scp ${SCP_OPTS} -P 10022 root@localhost:/root/assignment-4-result.txt test_result
 				rc=$?
 				if [ $rc -ne 0 ]; then
-					add_validate_error "Failed to SCP assignment-4-result.txt from remote !!!"
+					add_validate_error "Failed to scp assignment-4-result.txt from remote !!!"
 				fi
 			else
 				add_validate_error "assignment-4-result.txt found but not located at ~/ Dir"
 			fi
 
-			sshpass -p 'root' scp -P 10022 root@localhost:/tmp/ecen5013/ECEN_5013_IS_AWESOME10 test_result
+			sshpass -p 'root' scp ${SCP_OPTS} -P 10022 root@localhost:/tmp/ecen5013/ECEN_5013_IS_AWESOME10 test_result
 			rc=$?
 			if [ $rc -ne 0 ]; then
-				sshpass -p 'root' scp -P 10022 root@localhost:/tmp/aesd-data/AESD_IS_AWESOME10 test_result
+				sshpass -p 'root' scp ${SCP_OPTS} -P 10022 root@localhost:/tmp/aesd-data/AESD_IS_AWESOME10 test_result
 				rc=$?
 				if [ $rc -ne 0 ]; then
-					add_validate_error "Failed to SCP ECEN_5013_IS_AWESOME10 from remote !!!"
+					add_validate_error "Failed to scp ECEN_5013_IS_AWESOME10 from remote !!!"
 				fi
 			fi
 
