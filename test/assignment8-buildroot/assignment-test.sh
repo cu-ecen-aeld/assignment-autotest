@@ -15,8 +15,6 @@ echo "starting test with SKIP_BUILD ${SKIP_BUILD} and DO_VALIDATE ${DO_VALIDATE}
 if [[ -z ${SKIP_BUILD} || ${SKIP_BUILD} -eq 0 ]]; then
     pushd ${testdir}
     . ${script_dir}/buildroot-common-build.sh
-    rc=$?
-    echo "build step complete with status $?"
     echo "Validation errors ${validate_error}"
     popd
 fi

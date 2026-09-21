@@ -15,7 +15,6 @@ echo "starting test with SKIP_BUILD ${SKIP_BUILD} and DO_VALIDATE ${DO_VALIDATE}
 if [[ -z ${SKIP_BUILD} || ${SKIP_BUILD} -eq 0 ]]; then
     . ./assignment-5-build.sh ${testdir}
     rc=$?
-    echo "build step complete with status $?"
     echo "Validation errors ${validate_error}"
 fi
 

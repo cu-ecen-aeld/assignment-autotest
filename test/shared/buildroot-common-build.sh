@@ -87,3 +87,4 @@ fi
 if [ $rc -ne 0 ]; then
 	add_validate_error "Build script failed with error $rc"
 fi
+
