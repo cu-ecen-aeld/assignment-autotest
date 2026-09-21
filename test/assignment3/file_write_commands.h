@@ -31,7 +31,7 @@ static inline char * malloc_first_line_of_file(const char *filename)
          */
         bytes_read = getline(&buffer, &len, fp);
         if ( bytes_read < 1 ) {
-            printf("Could not read from conf/username.txt\n");
+            printf("Could not read from testfile.txt\n");
         } else {
             // remove delimeter
             if ( buffer[bytes_read-1] == '\r' || buffer[bytes_read-1] == '\n' ) {
