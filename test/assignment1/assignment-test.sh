@@ -27,7 +27,7 @@ if [ $rc -ne 0 ]; then
 fi
 
 # generate directory name from random string
-dir_name=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w32 | head -n 1)
+dir_name=$(dd bs=30 count=1 status=none if=/dev/urandom | tr -dc 'a-zA-Z0-9')
 ./finder-test.sh 10 AELD_IS_FUN $dir_name
 
 rc=$?
